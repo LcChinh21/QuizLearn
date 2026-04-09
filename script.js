@@ -152,6 +152,18 @@ const testScoreText = document.getElementById("test-score-text");
 const testResultDetails = document.getElementById("test-result-details");
 
 // State
+let isAuthenticated = false;
+function checkPassword() {
+    if (isAuthenticated) return true;
+    const pwd = prompt("Vui lòng nhập mật khẩu thao tác (Password: ChinhLeCute):");
+    if (pwd === "ChinhLeCute") {
+        isAuthenticated = true;
+        return true;
+    }
+    if (pwd !== null) alert("Mật khẩu không chính xác!");
+    return false;
+}
+
 let flashcardIndex = 0;
 let learnQueue = [];
 let testQueue = [];
@@ -221,6 +233,7 @@ function renderDashboard() {
 }
 
 document.getElementById("create-set-btn").addEventListener("click", async () => {
+    if (!checkPassword()) return;
     let nameInput = document.getElementById("new-set-name");
     let name = nameInput.value.trim();
     if(name) {
@@ -240,6 +253,7 @@ document.getElementById("create-set-btn").addEventListener("click", async () => 
 });
 
 window.deleteSet = async function(id) {
+    if (!checkPassword()) return;
     if(confirm("Are you sure you want to delete this study set?")) {
         appData = appData.filter(s => s.id !== id);
         localStorage.setItem("quizlet_data", JSON.stringify(appData));
@@ -301,6 +315,7 @@ nextBtn.addEventListener("click", () => { if (flashcardIndex < vocabulary.length
 
 // ----- Add Word & List -----
 addWordBtn.addEventListener("click", () => {
+    if (!checkPassword()) return;
     const word = newWordInput.value.trim();
     const meaning = newMeaningInput.value.trim();
     if (word && meaning) {
@@ -320,7 +335,12 @@ function renderWordList() {
         wordListContainer.appendChild(div);
     });
 }
-window.deleteWord = function(index) { vocabulary.splice(index, 1); saveData(); initFlashcards(); };
+window.deleteWord = function(index) { 
+    if (!checkPassword()) return;
+    vocabulary.splice(index, 1); 
+    saveData(); 
+    initFlashcards(); 
+};
 
 // ----- General Question Generator Helper -----
 function getQuestionData(wordObj, dirPref) {
