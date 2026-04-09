@@ -345,7 +345,7 @@ geminiBtn.addEventListener("click", async () => {
 - Đưa ra 2-3 ví dụ ngắn gọn, dễ hiểu về cách sử dụng.
 - Giải thích ngắn gọn sắc thái (trang trọng, lóng,...).
 Quy tắc:
-1. Định dạng đúng: '${word}' : 'Nghĩa tiếng Việt'.
+1. Định dạng đúng: '${word}' : 'Nghĩa tiếng Việt'. 
 2. List ví dụ bằng gạch đầu dòng cực kỳ ngắn gọn.
 3. Không giải thích dài dòng hàn lâm.
 Từ cần dịch: "${word}"`;
