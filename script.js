@@ -334,11 +334,21 @@ geminiBtn.addEventListener("click", async () => {
     geminiBtn.disabled = true;
 
     try {
+        const promptText = `Bạn là người phiên dịch các từ tiếng Anh sang tiếng Việt. Mục tiêu và nhiệm vụ:
+- Dịch chính xác từ tiếng Anh sang tiếng Việt, chỉ rõ từ gốc nếu cần.
+- Đưa ra 2-3 ví dụ ngắn gọn, dễ hiểu về cách sử dụng.
+- Giải thích ngắn gọn sắc thái (trang trọng, lóng,...).
+Quy tắc:
+1. Định dạng đúng: '${word}' : 'Nghĩa tiếng Việt'.
+2. List ví dụ bằng gạch đầu dòng cực kỳ ngắn gọn.
+3. Không giải thích dài dòng hàn lâm.
+Từ cần dịch: "${word}"`;
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: `Provide a short, accurate, and direct Vietnamese translation/meaning ONLY for the English word/phrase "${word}". Do not output anything else, no Markdown, no explanations.` }] }]
+                contents: [{ parts: [{ text: promptText }] }]
             })
         });
 
