@@ -155,7 +155,7 @@ const testResultDetails = document.getElementById("test-result-details");
 let isAuthenticated = false;
 function checkPassword() {
     if (isAuthenticated) return true;
-    const pwd = prompt("Vui lòng nhập mật khẩu thao tác (Password: ChinhLeCute):");
+    const pwd = prompt("Vui lòng nhập mật khẩu để tiếp tục thao tác:");
     if (pwd === "ChinhLeCute") {
         isAuthenticated = true;
         return true;
