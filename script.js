@@ -326,12 +326,8 @@ geminiBtn.addEventListener("click", async () => {
         return;
     }
     
-    let apiKey = localStorage.getItem("gemini_api_key");
-    if (!apiKey) {
-        apiKey = prompt("Vui lòng nhập Gemini API Key của bạn (Key sẽ được lưu trữ an toàn trong trình duyệt cục bộ):");
-        if (!apiKey) return;
-        localStorage.setItem("gemini_api_key", apiKey);
-    }
+    // Gắn cứng API Key
+    const apiKey = "AIzaSyBaCiUpjC5s4cyiIzhvplXdnXzMBQrz2AE";
 
     const originalText = geminiBtn.innerHTML;
     geminiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang dịch...';
@@ -360,8 +356,7 @@ Từ cần dịch: "${word}"`;
 
         if (!response.ok) {
             if (response.status === 400 || response.status === 403) {
-                localStorage.removeItem("gemini_api_key");
-                throw new Error("API Key không hợp lệ hoặc hết hạn.");
+                throw new Error("API Key không hợp lệ hoặc model không được hỗ trợ.");
             }
             throw new Error(`Lỗi HTTP: ${response.status}`);
         }
