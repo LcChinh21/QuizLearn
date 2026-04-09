@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">      
+    <title>LangLearn - English Vocabulary Master</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo"><i class="fas fa-book-open"></i> LangLearn</div>
+        <nav class="nav-links">
+            <button class="nav-btn active" id="tab-dashboard" data-target="dashboard-section"><i class="fas fa-chart-pie"></i> Sets</button>
+            <button class="nav-btn hidden" data-target="flashcards-section" id="tab-flashcards">
+                <i class="fas fa-clone"></i> Flashcards
+            </button>
+            <button class="nav-btn" data-target="learn-section" id="tab-learn"> 
+                <i class="fas fa-graduation-cap"></i> Learn
+            </button>
+            <button class="nav-btn" data-target="test-section" id="tab-test">   
+                <i class="fas fa-file-alt"></i> Test
+            </button>
+        </nav>
+    </header>
+
+    <main>
+                <!-- DASHBOARD SECTION -->
+        <section id="dashboard-section" class="app-section">
+            <div class="section-header">
+                <h2>Your Study Sets</h2>
+            </div>
+            <div class="word-management" style="margin-bottom: 2rem;">
+                <div class="add-word-form">
+                    <input type="text" id="new-set-name" placeholder="New group name..." required>
+                    <button id="create-set-btn" class="primary-btn" style="white-space: nowrap;"><i class="fas fa-plus"></i> Create Set</button>
+                </div>
+            </div>
+            <div class="set-grid" id="set-grid">
+                <!-- Sets go here -->
+            </div>
+        </section>
+
+        <!-- FLASHCARDS SECTION -->
+        <section id="flashcards-section" class="app-section hidden">
+            <div class="section-header">
+                <h2 id="current-set-title-display">Flashcard Study</h2>
+            </div>
+
+            <div class="flashcard-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="front" id="card-front">Welcome</div>
+                    <div class="back" id="card-back">Let's Learn!</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn" id="prev-btn" title="Previous word">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span class="counter" id="card-counter">0 / 0</span>
+                <button class="control-btn" id="next-btn" title="Next word">    
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <div class="word-management">
+                <h3><i class="fas fa-plus-circle"></i> Add New Word</h3>        
+                <div class="add-word-form">
+                    <input type="text" id="new-word" placeholder="Term (e.g. Serendipity)" required>
+                    <input type="text" id="new-meaning" placeholder="Definition (e.g. May mắn)" required>
+                    <button id="add-word-btn" class="primary-btn">
+                        <i class="fas fa-plus"></i> Add Word
+                    </button>
+                </div>
+
+                <div class="word-list">
+                    <div class="list-header">
+                        <h3>Terms (<span id="total-words-count">0</span>)</h3>  
+                    </div>
+                    <div id="word-list-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEARN SECTION -->
+        <section id="learn-section" class="app-section hidden">
+            <div class="section-header learn-test-header">
+                <h2 id="learn-set-title-display">Learn Mode</h2>
+                <button id="learn-settings-btn" class="icon-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+
+            <div id="learn-settings-panel" class="settings-panel hidden">       
+                <h3>Learning Options</h3>
+                <div class="setting-group">
+                    <label><b>Question Types:</b></label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="setting-mc" checked> Multiple Choice
+                        </label>
+                        <label>
+                            <input type="checkbox" id="setting-written"> Written Answer
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label><b>Question Direction:</b></label>
+                    <select id="setting-direction">
+                        <option value="en">Term → Definition</option>
+                        <option value="vi">Definition → Term</option>
+                        <option value="random">Random</option>
+                    </select>
+                </div>
+                <button id="save-learn-settings" class="primary-btn">Save & Start</button>
+            </div>
+
+            <div id="learn-card-area" class="learn-card">
+                <div class="progress-bar">
+                    <span id="learn-progress">0/0</span>
+                </div>
+                <div class="question-area">
+                    <h3 id="learn-question">Question here</h3>
+                </div>
+
+                <!-- Multiple Choice -->
+                <div class="options-grid" id="learn-options"></div>
+
+                <!-- Written Answer -->
+                <div class="written-area hidden" id="learn-written">
+                    <input type="text" id="learn-answer-input" placeholder="Type your answer...">
+                    <button id="learn-submit-btn" class="primary-btn">Submit Answer</button>
+                    <div id="learn-feedback" class="feedback hidden"></div>     
+                </div>
+            </div>
+
+            <div id="learn-results" class="results-area hidden">
+                <h2>Learning Complete! 🎉</h2>
+                <p id="learn-result-details">Amazing job!</p>
+                <button id="learn-restart" class="primary-btn">Try Again</button>
+            </div>
+        </section>
+
+        <!-- TEST SECTION -->
+        <section id="test-section" class="app-section hidden">
+            <div class="section-header learn-test-header">
+                <h2 id="test-set-title-display">Test Mode</h2>
+                <button id="test-settings-btn" class="icon-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+
+            <div id="test-settings-panel" class="settings-panel hidden">        
+                <h3>Test Options</h3>
+                <div class="setting-group">
+                    <label><b>Question Types:</b></label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="test-setting-mc" checked> Multiple Choice
+                        </label>
+                        <label>
+                            <input type="checkbox" id="test-setting-written"> Written Answer
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label><b>Question Direction:</b></label>
+                    <select id="test-setting-direction">
+                        <option value="en">Term → Definition</option>
+                        <option value="vi">Definition → Term</option>
+                        <option value="random">Random</option>
+                    </select>
+                </div>
+                <button id="save-test-settings" class="primary-btn">Start Test</button>
+            </div>
+
+            <div id="test-card-area" class="learn-card">
+                <div class="progress-bar">
+                    <span id="test-progress">0/0</span>
+                </div>
+                <div class="question-area">
+                    <h3 id="test-question">Question here</h3>
+                </div>
+
+                <!-- Multiple Choice -->
+                <div class="options-grid" id="test-options"></div>
+
+                <!-- Written Answer -->
+                <div class="written-area hidden" id="test-written">
+                    <input type="text" id="test-answer-input" placeholder="Type your answer...">
+                    <button id="test-submit-btn" class="primary-btn">Submit Answer</button>
+                    <div id="test-feedback" class="feedback hidden"></div>      
+                </div>
+            </div>
+
+            <div id="test-results" class="results-area hidden">
+                <h2>Test Results</h2>
+                <div class="score-circle" id="test-score-text">--</div>
+                <p id="test-result-details">Test complete!</p>
+                <button id="test-restart" class="primary-btn">Take Another Test</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Debug: catch ALL errors including those from script.js parsing
+        window._allErrors = [];
+        window.addEventListener('error', function(e) {
+            window._allErrors.push(e.message + ' at line ' + e.lineno);
+            document.title = 'JS_ERROR: ' + e.message;
+        });
+    </script>
+    <script src="script.js?v=2"></script>
+</body>
+</html>
+
+
+
