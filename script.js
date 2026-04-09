@@ -111,7 +111,11 @@ const totalWordsCount = document.getElementById("total-words-count");
 const newWordInput = document.getElementById("new-word");
 const newMeaningInput = document.getElementById("new-meaning");
 const addWordBtn = document.getElementById("add-word-btn");
+
+// AI Elements
 const geminiBtn = document.getElementById("gemini-btn");
+const aiLookupInput = document.getElementById("ai-lookup-input");
+const aiResultBox = document.getElementById("ai-result-box");
 
 // Learn Elements
 const learnQuestion = document.getElementById("learn-question");
@@ -316,9 +320,9 @@ nextBtn.addEventListener("click", () => { if (flashcardIndex < vocabulary.length
 
 // ----- Add Word & List -----
 geminiBtn.addEventListener("click", async () => {
-    const word = newWordInput.value.trim();
+    const word = aiLookupInput.value.trim();
     if (!word) {
-        alert("Vui lòng nhập từ tiếng Anh trước khi dùng AI dịch nghĩa!");
+        alert("Vui lòng nhập từ tiếng Anh để AI dịch nghĩa!");
         return;
     }
     
@@ -330,8 +334,10 @@ geminiBtn.addEventListener("click", async () => {
     }
 
     const originalText = geminiBtn.innerHTML;
-    geminiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    geminiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang dịch...';
     geminiBtn.disabled = true;
+    aiResultBox.classList.remove("hidden");
+    aiResultBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI đang suy nghĩ...';
 
     try {
         const promptText = `Bạn là người phiên dịch các từ tiếng Anh sang tiếng Việt. Mục tiêu và nhiệm vụ:
@@ -363,14 +369,19 @@ Từ cần dịch: "${word}"`;
         const data = await response.json();
         const meaning = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
         if (meaning) {
-            newMeaningInput.value = meaning;
-            // Optionally auto-add: addWordBtn.click();
+            aiResultBox.innerHTML = meaning;
+            // Optionally auto-fill the add word form for convenience:
+            newWordInput.value = word;
+            // Extract just the translation part roughly for the meaning input
+            const firstLine = meaning.split('\n')[0];
+            const meaningPart = firstLine.split(':')[1]?.trim().replace(/'$/, '') || "";
+            if(meaningPart) newMeaningInput.value = meaningPart;
         } else {
-            alert("Không tìm thấy nghĩa của từ này.");
+            aiResultBox.innerHTML = "Không tìm thấy nghĩa của từ này.";
         }
     } catch (error) {
         console.error("Gemini API Error:", error);
-        alert(`Lỗi khi dịch: ${error.message}`);
+        aiResultBox.innerHTML = `<span style="color: red;">Lỗi khi dịch: ${error.message}</span>`;
     } finally {
         geminiBtn.innerHTML = originalText;
         geminiBtn.disabled = false;
