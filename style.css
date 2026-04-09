@@ -144,6 +144,57 @@ body {
     .results-area h2 {
         font-size: 2rem;
     }
+
+    /* List item mobile optimization */
+    .list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        position: relative;
+        padding: 1.2rem 1rem;
+    }
+
+    .list-word {
+        padding-right: 30px;
+        width: 100%;
+        border-bottom: 2px dashed var(--border-color);
+        padding-bottom: 10px;
+    }
+
+    .list-meaning {
+        border-left: none;
+        padding-left: 0;
+        width: 100%;
+    }
+
+    .delete-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+
+    /* Nav links scrolling */
+    .nav-links {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-links::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .nav-links::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+    }
+
+    .nav-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
 }
 
 /* Header */
