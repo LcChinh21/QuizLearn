@@ -111,6 +111,7 @@ const totalWordsCount = document.getElementById("total-words-count");
 const newWordInput = document.getElementById("new-word");
 const newMeaningInput = document.getElementById("new-meaning");
 const addWordBtn = document.getElementById("add-word-btn");
+const geminiBtn = document.getElementById("gemini-btn");
 
 // Learn Elements
 const learnQuestion = document.getElementById("learn-question");
@@ -314,6 +315,58 @@ prevBtn.addEventListener("click", () => { if (flashcardIndex > 0) { flashcardInd
 nextBtn.addEventListener("click", () => { if (flashcardIndex < vocabulary.length - 1) { flashcardIndex++; updateCard(); } });
 
 // ----- Add Word & List -----
+geminiBtn.addEventListener("click", async () => {
+    const word = newWordInput.value.trim();
+    if (!word) {
+        alert("Vui lòng nhập từ tiếng Anh trước khi dùng AI dịch nghĩa!");
+        return;
+    }
+    
+    let apiKey = localStorage.getItem("gemini_api_key");
+    if (!apiKey) {
+        apiKey = prompt("Vui lòng nhập Gemini API Key của bạn (Key sẽ được lưu trữ an toàn trong trình duyệt cục bộ):");
+        if (!apiKey) return;
+        localStorage.setItem("gemini_api_key", apiKey);
+    }
+
+    const originalText = geminiBtn.innerHTML;
+    geminiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    geminiBtn.disabled = true;
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: `Provide a short, accurate, and direct Vietnamese translation/meaning ONLY for the English word/phrase "${word}". Do not output anything else, no Markdown, no explanations.` }] }]
+            })
+        });
+
+        if (!response.ok) {
+            if (response.status === 400 || response.status === 403) {
+                localStorage.removeItem("gemini_api_key");
+                throw new Error("API Key không hợp lệ hoặc hết hạn.");
+            }
+            throw new Error(`Lỗi HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const meaning = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+        if (meaning) {
+            newMeaningInput.value = meaning;
+            // Optionally auto-add: addWordBtn.click();
+        } else {
+            alert("Không tìm thấy nghĩa của từ này.");
+        }
+    } catch (error) {
+        console.error("Gemini API Error:", error);
+        alert(`Lỗi khi dịch: ${error.message}`);
+    } finally {
+        geminiBtn.innerHTML = originalText;
+        geminiBtn.disabled = false;
+    }
+});
+
 addWordBtn.addEventListener("click", () => {
     if (!checkPassword()) return;
     const word = newWordInput.value.trim();
