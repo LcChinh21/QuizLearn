@@ -374,7 +374,7 @@ Từ cần dịch: "${word}"`;
             newWordInput.value = word;
             // Extract just the translation part roughly for the meaning input
             const firstLine = meaning.split('\n')[0];
-            const meaningPart = firstLine.split(':')[1]?.trim().replace(/'$/, '') || "";
+            const meaningPart = firstLine.split(':')[1]?.trim().replace(/^'|'$/g, '').trim() || "";
             if(meaningPart) newMeaningInput.value = meaningPart;
         } else {
             aiResultBox.innerHTML = "Không tìm thấy nghĩa của từ này.";
@@ -417,6 +417,13 @@ window.deleteWord = function(index) {
 };
 
 // ----- General Question Generator Helper -----
+function isAnswerMatch(userInput, storedAnswer) {
+    const inputWords = userInput.toLowerCase().split(',').map(s => s.trim());
+    const storedWords = storedAnswer.toLowerCase().split(',').map(s => s.trim());
+    // Mảng có phần tử chung? (True nếu user nhập bất kỳ nghĩa nào đúng)
+    return inputWords.some(w => storedWords.includes(w));
+}
+
 function getQuestionData(wordObj, dirPref) {
     let direction = dirPref;
     if (direction === "random") direction = Math.random() > 0.5 ? "en" : "vi";
@@ -492,7 +499,7 @@ function nextLearnQuestion() {
 }
 
 function checkLearnAnswer(btn, selectedAns, correctAns, type) {
-    let isCorrect = (selectedAns.toLowerCase() === correctAns.toLowerCase());
+    const isCorrect = isAnswerMatch(selectedAns, correctAns);
     
     if(type === "mc") {
         const buttons = learnOptions.querySelectorAll("button");
@@ -502,7 +509,7 @@ function checkLearnAnswer(btn, selectedAns, correctAns, type) {
         } else {
             learnErrors++;
             btn.classList.add("incorrect");
-            buttons.forEach(b => { if(b.textContent.toLowerCase() === correctAns.toLowerCase()) b.classList.add("correct"); });
+            buttons.forEach(b => { if(isAnswerMatch(b.textContent, correctAns)) b.classList.add("correct"); });
             learnQueue.push(currentLearnWord); // return to queue to learn again
         }
     } else {
@@ -587,7 +594,7 @@ function nextTestQuestion() {
 }
 
 function checkTestAnswer(btn, selectedAns, correctAns, type) {
-    let isCorrect = (selectedAns.toLowerCase() === correctAns.toLowerCase());
+    const isCorrect = isAnswerMatch(selectedAns, correctAns);
     
     if(type === "mc") {
         const buttons = testOptions.querySelectorAll("button");
@@ -596,7 +603,7 @@ function checkTestAnswer(btn, selectedAns, correctAns, type) {
             testCorrect++; btn.classList.add("correct");
         } else {
             btn.classList.add("incorrect");
-            buttons.forEach(b => { if(b.textContent.toLowerCase() === correctAns.toLowerCase()) b.classList.add("correct"); });
+            buttons.forEach(b => { if(isAnswerMatch(b.textContent, correctAns)) b.classList.add("correct"); });
         }
     } else {
         testFeedback.classList.remove("hidden", "correct", "incorrect");
