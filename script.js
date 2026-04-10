@@ -533,27 +533,27 @@ function nextLearnQuestion() {
     }
 }
 
-// System Meme Storage (Using Giphy GIFs for fast loading and dynamic fun)
+// System Meme Storage (Using Tenor GIFs for fast loading without hotlink blocks)
 const memes = {
     correct: [
-        "https://media.giphy.com/media/11ISwbgCxEzMyY/giphy.gif", // Leo cheers
-        "https://media.giphy.com/media/nxxZv208h42EubyS3i/giphy.gif", // Obama thumbs up
-        "https://media.giphy.com/media/26hirEPeos6yGJZok/giphy.gif", // Success kid
-        "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif", // Carlton dance
-        "https://media.giphy.com/media/xT0xezQGU5xCDJuCPe/giphy.gif", // Minions
-        "https://media.giphy.com/media/3o72FcJmLzIdYJqwXm/giphy.gif", // Will Ferrell YES
-        "https://media.giphy.com/media/Jp4V0QyR2AITkP3N1P/giphy.gif", // Cat happy
-        "https://media.giphy.com/media/l0HTYLqYYU360Wkfi/giphy.gif" // Dog dance
+        "https://media.tenor.com/_q1AauT1KbwAAAAj/success-kid.gif", // Success kid
+        "https://media.tenor.com/tYm0JgQ6U1sAAAAj/leo-dicaprio.gif", // Leo cheers
+        "https://media.tenor.com/2Q-oBtvV2-oAAAAj/thumbs-up.gif", // Obama thumbs up
+        "https://media.tenor.com/g8z11j6D_KAAAAAj/carlton-dance.gif", // Carlton dance
+        "https://media.tenor.com/u7q10n82iLIAAAAj/minions-cheering.gif", // Minions
+        "https://media.tenor.com/PZzKk46GfLgAAAAj/will-ferrell.gif", // Will Ferrell YES
+        "https://media.tenor.com/N7kIqI7Nf58AAAAj/happy.gif", // Cat happy
+        "https://media.tenor.com/N18zST1q8FMAAAAj/dog-dancing.gif" // Dog dance
     ],
     incorrect: [
-        "https://media.giphy.com/media/8UGoOaR1lA1uaAN892/giphy.gif", // Michael Scott Facepalm
-        "https://media.giphy.com/media/l41Ym49ppcDP6iY3C/giphy.gif", // Cat facepalm
-        "https://media.giphy.com/media/xT5LMzIK1AdZJ4cYW4/giphy.gif", // Homer bush
-        "https://media.giphy.com/media/12Msh5VHHsBIfS/giphy.gif", // Monkey confused
-        "https://media.giphy.com/media/kC2cRqEt8o41RoEzN5/giphy.gif", // Crying cat
-        "https://media.giphy.com/media/3o6Zt62PeJeFUDwBUI/giphy.gif", // Nope Nope Nope
-        "https://media.giphy.com/media/26BRQkCCJOrx6qWkw/giphy.gif", // No Steve Carell
-        "https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif" // Crying Dawson
+        "https://media.tenor.com/J3-4-gXf1b0AAAAj/facepalm-picard.gif", // Picard Facepalm 
+        "https://media.tenor.com/812V5P4e7W4AAAAj/cat-facepalm.gif", // Cat facepalm
+        "https://media.tenor.com/P1v3t6eOMJgAAAAj/homer-simpson-bush.gif", // Homer bush
+        "https://media.tenor.com/1-6K5eF4f-UAAAAj/monkey-confused.gif", // Monkey confused
+        "https://media.tenor.com/aNqZ6Yh_E8gAAAAj/crying-cat.gif", // Crying cat
+        "https://media.tenor.com/0vE85R3S4W4AAAAj/nope.gif", // Nope nope nope
+        "https://media.tenor.com/6XyE1uXl0FMAAAAj/michael-scott-no.gif", // No Steve Carell
+        "https://media.tenor.com/B9B086n7_S0AAAAj/crying-sad.gif" // Crying Dawson
     ]
 };
 
