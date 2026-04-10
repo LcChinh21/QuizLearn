@@ -533,29 +533,27 @@ function nextLearnQuestion() {
     }
 }
 
-// System Meme Storage (Using Imgur & Imgflip to bypass Giphy 'Content Not Available' hotlink blocks)
+// System Meme Storage (Using Giphy GIFs for fast loading and dynamic fun)
 const memes = {
     correct: [
-        "https://i.imgur.com/YPT5N.gif", // Yes kid gif
-        "https://i.imgur.com/nxdzH1K.gif", // Obama thumbs up gif
-        "https://i.imgur.com/FNBQ7.gif", // Leo applause gif
-        "https://i.imgur.com/w4kS5.gif", // Carlton dance gif
-        "https://i.imgur.com/VIfh3bY.gif", // Shia LaBeouf magic
-        "https://i.imgur.com/3ZRPu.gif", // Nodding approval
-        "https://i.imgur.com/4qG2I.gif", // Jonah Hill YES
-        "https://i.imgur.com/tBv0Q.gif", // Minions cheering
-        "https://i.imgur.com/8QjR2.gif" // Spongebob rainbow
+        "https://media.giphy.com/media/11ISwbgCxEzMyY/giphy.gif", // Leo cheers
+        "https://media.giphy.com/media/nxxZv208h42EubyS3i/giphy.gif", // Obama thumbs up
+        "https://media.giphy.com/media/26hirEPeos6yGJZok/giphy.gif", // Success kid
+        "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif", // Carlton dance
+        "https://media.giphy.com/media/xT0xezQGU5xCDJuCPe/giphy.gif", // Minions
+        "https://media.giphy.com/media/3o72FcJmLzIdYJqwXm/giphy.gif", // Will Ferrell YES
+        "https://media.giphy.com/media/Jp4V0QyR2AITkP3N1P/giphy.gif", // Cat happy
+        "https://media.giphy.com/media/l0HTYLqYYU360Wkfi/giphy.gif" // Dog dance
     ],
     incorrect: [
-        "https://i.imgur.com/iWKad22.gif", // Facepalm anime gif
-        "https://i.imgur.com/qFj6w.gif", // Nope cat gif
-        "https://i.imgur.com/13wE93l.gif", // Crying meme gif
-        "https://i.imgur.com/MLM8V.gif", // Picard facepalm gif
-        "https://i.imgur.com/tL803L9.gif", // Michael Scott NO NO NO gif
-        "https://i.imgur.com/5XvPj.gif", // Crying baby gif
-        "https://i.imgur.com/WbKzI.gif", // Disappointed crowd
-        "https://i.imgur.com/4XZ1k.gif", // Homer disappearing
-        "https://i.imgur.com/2sOMQ.gif"  // Falling panda/fail
+        "https://media.giphy.com/media/8UGoOaR1lA1uaAN892/giphy.gif", // Michael Scott Facepalm
+        "https://media.giphy.com/media/l41Ym49ppcDP6iY3C/giphy.gif", // Cat facepalm
+        "https://media.giphy.com/media/xT5LMzIK1AdZJ4cYW4/giphy.gif", // Homer bush
+        "https://media.giphy.com/media/12Msh5VHHsBIfS/giphy.gif", // Monkey confused
+        "https://media.giphy.com/media/kC2cRqEt8o41RoEzN5/giphy.gif", // Crying cat
+        "https://media.giphy.com/media/3o6Zt62PeJeFUDwBUI/giphy.gif", // Nope Nope Nope
+        "https://media.giphy.com/media/26BRQkCCJOrx6qWkw/giphy.gif", // No Steve Carell
+        "https://media.giphy.com/media/d2lcHJTG5Tscg/giphy.gif" // Crying Dawson
     ]
 };
 
