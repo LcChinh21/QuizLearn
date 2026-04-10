@@ -356,7 +356,9 @@ geminiBtn.addEventListener("click", async () => {
         }
 
         const data = await response.json();
-        const meaning = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+        // Groq/Llama sẽ trả text thẳng qua thuộc tính data.text (do thiết lập tại API serverless)
+        const meaning = data.text?.trim() || "";
+        
         if (meaning) {
             // -- Format AI Result for UI --
             let formattedHtml = "";

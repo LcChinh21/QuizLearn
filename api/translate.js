@@ -9,35 +9,47 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing word' });
         }
 
-        const promptText = `Bạn là người phiên dịch các từ tiếng Anh sang tiếng Việt. Mục tiêu và nhiệm vụ:
+        const systemPrompt = `Bạn là người phiên dịch các từ tiếng Anh sang tiếng Việt. Mục tiêu và nhiệm vụ:
 - Dịch chính xác từ tiếng Anh sang tiếng Việt, chỉ rõ từ gốc nếu cần.
 - Đưa ra 2-3 ví dụ ngắn gọn, dễ hiểu về cách sử dụng.
 - Giải thích ngắn gọn sắc thái (trang trọng, lóng,...).
 Quy tắc:
 1. Định dạng đúng: '${word}' : 'Nghĩa tiếng Việt'. (Nếu có nhiều nghĩa thì phân cách bằng dấu phẩy) VD: 'Run' : 'Chạy, vận hành'.
 2. List ví dụ bằng gạch đầu dòng cực kỳ ngắn gọn. (Tiếng anh trước rồi tiếng Việt) VD: - Run a business: Điều hành một doanh nghiệp.
-3. Không giải thích dài dòng hàn lâm.
-Từ cần dịch: "${word}"`;
+3. Không giải thích dài dòng hàn lâm.`;
 
-        const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY; // Lấy key từ Vercel Environment Variables
+        const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY; 
         if (!apiKey) {
-             return res.status(500).json({ error: 'Missing GEMINI_API_KEY in environment. Vui lòng thêm biến môi trường này vào Vercel.' });
+             return res.status(500).json({ error: 'Missing GROQ_API_KEY in environment. Vui lòng thêm biến môi trường này vào Vercel.' });
         }
 
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, {
+        // Dùng chuẩn OpenAI API trỏ sang domain của Groq
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${apiKey}`
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }]
+                model: "llama-3.1-8b-instant",
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: `Từ cần dịch: "${word}"` }
+                ],
+                temperature: 0.7
             })
         });
 
         if (!response.ok) {
-            throw new Error(`Google API responded with status: ${response.status}`);
+            const errBody = await response.text();
+            throw new Error(`Groq API Error HTTP ${response.status}: ${errBody}`);
         }
 
         const data = await response.json();
-        res.status(200).json(data);
+        // Ta bóc trần sẵn text ở Backend gửi cho Frontend luôn, để Front đỡ tốn logic
+        const textMeaning = data.choices?.[0]?.message?.content || "";
+        
+        res.status(200).json({ text: textMeaning });
 
     } catch (error) {
         console.error('API Error:', error.message);
