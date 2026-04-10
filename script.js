@@ -533,27 +533,21 @@ function nextLearnQuestion() {
     }
 }
 
-// System Meme Storage (Using Tenor GIFs for fast loading without hotlink blocks)
+// System Meme Storage (Local GIFs for maximum load speed)
 const memes = {
     correct: [
-        "https://media.tenor.com/_q1AauT1KbwAAAAj/success-kid.gif", // Success kid
-        "https://media.tenor.com/tYm0JgQ6U1sAAAAj/leo-dicaprio.gif", // Leo cheers
-        "https://media.tenor.com/2Q-oBtvV2-oAAAAj/thumbs-up.gif", // Obama thumbs up
-        "https://media.tenor.com/g8z11j6D_KAAAAAj/carlton-dance.gif", // Carlton dance
-        "https://media.tenor.com/u7q10n82iLIAAAAj/minions-cheering.gif", // Minions
-        "https://media.tenor.com/PZzKk46GfLgAAAAj/will-ferrell.gif", // Will Ferrell YES
-        "https://media.tenor.com/N7kIqI7Nf58AAAAj/happy.gif", // Cat happy
-        "https://media.tenor.com/N18zST1q8FMAAAAj/dog-dancing.gif" // Dog dance
+        "memes/correct/1.gif",
+        "memes/correct/2.gif",
+        "memes/correct/3.gif",
+        "memes/correct/4.gif",
+        "memes/correct/5.gif"
     ],
     incorrect: [
-        "https://media.tenor.com/J3-4-gXf1b0AAAAj/facepalm-picard.gif", // Picard Facepalm 
-        "https://media.tenor.com/812V5P4e7W4AAAAj/cat-facepalm.gif", // Cat facepalm
-        "https://media.tenor.com/P1v3t6eOMJgAAAAj/homer-simpson-bush.gif", // Homer bush
-        "https://media.tenor.com/1-6K5eF4f-UAAAAj/monkey-confused.gif", // Monkey confused
-        "https://media.tenor.com/aNqZ6Yh_E8gAAAAj/crying-cat.gif", // Crying cat
-        "https://media.tenor.com/0vE85R3S4W4AAAAj/nope.gif", // Nope nope nope
-        "https://media.tenor.com/6XyE1uXl0FMAAAAj/michael-scott-no.gif", // No Steve Carell
-        "https://media.tenor.com/B9B086n7_S0AAAAj/crying-sad.gif" // Crying Dawson
+        "memes/incorrect/1.gif",
+        "memes/incorrect/2.gif",
+        "memes/incorrect/3.gif",
+        "memes/incorrect/4.gif",
+        "memes/incorrect/5.gif"
     ]
 };
 
