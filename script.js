@@ -1,11 +1,23 @@
 // ----- Data Management -----
-// ?? BU?C 1: �I?N TH�NG TIN SUPABASE C?A B?N V�O ��Y
-const SUPABASE_URL = "https://zeahkcbhtklsoxmtwodx.supabase.co"; // <-- �i?n Project URL
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplYWhrY2JodGtsc294bXR3b2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MzU3MDUsImV4cCI6MjA5MTMxMTcwNX0.Uueo73E-trMVtj2UkwK0OafB2xjtk-AOvzVSRiwP0Ro"; // <-- �i?n API Anon Key
-const SUPABASE_TABLE = "study_sets"; // T�n b?ng luu t? v?ng trong CSDL
+let supabaseClient = null;
+const SUPABASE_TABLE = "study_sets"; // Tên bảng lưu từ vựng trong CSDL
+let isSupabaseLoaded = false;
 
-// Kh?i t?o Supabase client (n?u c� nh�ng web SDK) n797
-const supabaseClient = window.supabase && SUPABASE_URL.includes("supabase.co") ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+async function setupSupabase() {
+    if (isSupabaseLoaded) return;
+    try {
+        const response = await fetch('/api/env');
+        const env = await response.json();
+        
+        if (env.SUPABASE_URL && env.SUPABASE_ANON_KEY && window.supabase) {
+            supabaseClient = window.supabase.createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+        }
+        isSupabaseLoaded = true;
+    } catch (e) {
+        console.warn("Chưa tải được ENV Supabase hoặc chạy offline.", e);
+        isSupabaseLoaded = true; // Mark as done to prevent infinite loops
+    }
+}
 
 let appData = [];
 try {
@@ -26,8 +38,7 @@ let currentSetId = null;
 let vocabulary = []; // Points to current set's words array
 
 // ?? �?ng b? d? li?u (Load Data)
-async function loadData() {
-    if (supabaseClient) {
+async function loadData() {    await setupSupabase();    if (supabaseClient) {
         try {
             const { data, error } = await supabaseClient.from(SUPABASE_TABLE).select('*');
             if (!error && data && data.length > 0) {
@@ -59,6 +70,7 @@ function migrateInitial() {
 
 // ?? Luu d? li?u (Save Data)
 async function saveData() {
+    await setupSupabase();
     if(!currentSetId) return;
     let idx = appData.findIndex(s => s.id === currentSetId);
     if (idx > -1) {
@@ -81,8 +93,7 @@ async function saveData() {
 }
 
 // H�m kh?i t?o ri�ng cho t?o Set (k�o th�m Upsert)
-async function saveSetToSupabase(newSet) {
-    if (supabaseClient) {
+async function saveSetToSupabase(newSet) {    await setupSupabase();    if (supabaseClient) {
         await supabaseClient.from(SUPABASE_TABLE).upsert({
             id: newSet.id,
             name: newSet.name,
@@ -263,8 +274,7 @@ window.deleteSet = async function(id) {
         appData = appData.filter(s => s.id !== id);
         localStorage.setItem("quizlet_data", JSON.stringify(appData));
         renderDashboard();
-        
-        // ?? C?p nh?t tr�n Cloud
+                await setupSupabase();        // ?? C?p nh?t tr�n Cloud
         if (typeof supabaseClient !== 'undefined' && supabaseClient) {
             await supabaseClient.from(SUPABASE_TABLE).delete().eq('id', id);
         }
@@ -326,9 +336,6 @@ geminiBtn.addEventListener("click", async () => {
         return;
     }
     
-    // Gắn cứng API Key
-    const apiKey = "AIzaSyBaCiUpjC5s4cyiIzhvplXdnXzMBQrz2AE";
-
     const originalText = geminiBtn.innerHTML;
     geminiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang dịch...';
     geminiBtn.disabled = true;
@@ -336,28 +343,14 @@ geminiBtn.addEventListener("click", async () => {
     aiResultBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI đang suy nghĩ...';
 
     try {
-        const promptText = `Bạn là người phiên dịch các từ tiếng Anh sang tiếng Việt. Mục tiêu và nhiệm vụ:
-- Dịch chính xác từ tiếng Anh sang tiếng Việt, chỉ rõ từ gốc nếu cần.
-- Đưa ra 2-3 ví dụ ngắn gọn, dễ hiểu về cách sử dụng.
-- Giải thích ngắn gọn sắc thái (trang trọng, lóng,...).
-Quy tắc:
-1. Định dạng đúng: '${word}' : 'Nghĩa tiếng Việt'. (Nếu có nhiều nghĩa thì phân cách bằng dấu phẩy) VD: 'Run' : 'Chạy, vận hành'.
-2. List ví dụ bằng gạch đầu dòng cực kỳ ngắn gọn. (Tiếng anh trước rồi tiếng Việt) VD: - Run a business: Điều hành một doanh nghiệp.
-3. Không giải thích dài dòng hàn lâm.
-Từ cần dịch: "${word}"`;
-
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, {
+        // Gọi tới serverless function trên Vercel thay vì lộ key trên FE
+        const response = await fetch('/api/translate', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }]
-            })
+            body: JSON.stringify({ word: word })
         });
 
         if (!response.ok) {
-            if (response.status === 400 || response.status === 403) {
-                throw new Error("API Key không hợp lệ hoặc model không được hỗ trợ.");
-            }
             throw new Error(`Lỗi HTTP: ${response.status}`);
         }
 

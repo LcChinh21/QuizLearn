@@ -1,0 +1,1 @@
+﻿fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBaCiUpjC5s4cyiIzhvplXdnXzMBQrz2AE', {method: 'POST', body: '{}'}).then(r=>console.log(r.status))
