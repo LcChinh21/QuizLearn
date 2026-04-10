@@ -499,6 +499,7 @@ function startLearnMode() {
 }
 
 function nextLearnQuestion() {
+    document.querySelectorAll(".meme-feedback").forEach(el => el.remove());
     if (learnQueue.length === 0) {
         learnCardArea.classList.add("hidden");
         learnResults.classList.remove("hidden");
@@ -532,27 +533,23 @@ function nextLearnQuestion() {
     }
 }
 
-// System Meme Storage
+// System Meme Storage (Using Imgur & Imgflip to bypass Giphy 'Content Not Available' hotlink blocks)
 const memes = {
     correct: [
-        "https://media.giphy.com/media/xT0BKL21U5nnlW4m6k/giphy.gif",
-        "https://media.giphy.com/media/cO39srN2EUIRaVqaVq/giphy.gif",
-        "https://media.giphy.com/media/11ISwbgCxEzMyY/giphy.gif", // Leonardo DiCaprio win
-        "https://media.giphy.com/media/nxxZv208h42EubyS3i/giphy.gif", // Obama thumbs up
-        "https://media.giphy.com/media/26hirEPeos6yGJZok/giphy.gif", // Baby fist pump
-        "https://media.giphy.com/media/3o72FcJmLzIdYJqwXm/giphy.gif", // Will Ferrell yes
-        "https://media.giphy.com/media/xT0xezQGU5xCDJuCPe/giphy.gif", // Minions cheer
-        "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif"  // Carlton dance
+        "https://i.imgflip.com/1bij.jpg", // Success kid
+        "https://i.imgflip.com/39t1o.jpg", // Leo cheers
+        "https://i.imgur.com/YPT5N.gif", // Yes kid gif
+        "https://i.imgur.com/nxdzH1K.gif", // Obama thumbs up gif
+        "https://i.imgur.com/FNBQ7.gif", // Leo applause gif
+        "https://i.imgur.com/Jz8b7.jpg" // Success baby alt
     ],
     incorrect: [
-        "https://media.giphy.com/media/1xpCuQhMhHzZ0B12z4/giphy.gif",
-        "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif",
-        "https://media.giphy.com/media/8UGoOaR1lA1uaAN892/giphy.gif", // Michael Scott facepalm
-        "https://media.giphy.com/media/l41Ym49ppcDP6iY3C/giphy.gif", // Cat facepalm
-        "https://media.giphy.com/media/3o6Zt62PeJeFUDwBUI/giphy.gif", // Nope nope nope
-        "https://media.giphy.com/media/xT5LMzIK1AdZJ4cYW4/giphy.gif", // Homer hide in bush
-        "https://media.giphy.com/media/12Msh5VHHsBIfS/giphy.gif", // Monkey confused
-        "https://media.giphy.com/media/kC2cRqEt8o41RoEzN5/giphy.gif" // Crying cat
+        "https://i.imgflip.com/1jwhww.jpg", // Picard facepalm
+        "https://i.imgflip.com/4dbtl.jpg", // Grumpy cat no
+        "https://i.imgflip.com/1h7in3.jpg", // Confused Nick Young
+        "https://i.imgur.com/iWKad22.gif", // Facepalm anime gif
+        "https://i.imgur.com/qFj6w.gif", // Nope cat gif
+        "https://i.imgur.com/13wE93l.gif" // Crying meme gif
     ]
 };
 
@@ -560,7 +557,7 @@ function getRandomMeme(isCorrect) {
     const list = isCorrect ? memes.correct : memes.incorrect;
     const url = list[Math.floor(Math.random() * list.length)];
     // Fallback if users add local images to folder: return `memes/${isCorrect ? 'correct' : 'incorrect'}/1.gif` etc.
-    return `<img src="${url}" alt="meme feedback" style="max-height: 120px; border-radius: 8px; margin-top: 10px; display: block; margin-left: auto; margin-right: auto;" />`;
+    return `<img class="meme-feedback" src="${url}" alt="meme feedback" style="max-height: 120px; border-radius: 8px; margin-top: 10px; display: block; margin-left: auto; margin-right: auto; animation: scaleIn 0.3s ease-out;" />`;
 }
 
 function checkLearnAnswer(btn, selectedAns, correctAns, type) {
@@ -626,6 +623,7 @@ function startTestMode() {
 }
 
 function nextTestQuestion() {
+    document.querySelectorAll(".meme-feedback").forEach(el => el.remove());
     if (testQueue.length === 0) {
         testCardArea.classList.add("hidden");
         testResults.classList.remove("hidden");
@@ -664,6 +662,7 @@ function nextTestQuestion() {
 
 function checkTestAnswer(btn, selectedAns, correctAns, type) {
     const isCorrect = isAnswerMatch(selectedAns, correctAns);
+    const memeHtml = getRandomMeme(isCorrect);
     
     if(type === "mc") {
         const buttons = testOptions.querySelectorAll("button");
@@ -674,15 +673,16 @@ function checkTestAnswer(btn, selectedAns, correctAns, type) {
             btn.classList.add("incorrect");
             buttons.forEach(b => { if(isAnswerMatch(b.textContent, correctAns)) b.classList.add("correct"); });
         }
+        testOptions.insertAdjacentHTML("beforebegin", memeHtml);
     } else {
         testFeedback.classList.remove("hidden", "correct", "incorrect");
         if (isCorrect) {
-            testCorrect++; testFeedback.textContent = "Correct!"; testFeedback.classList.add("correct");
+            testCorrect++; testFeedback.innerHTML = `Correct! ${memeHtml}`; testFeedback.classList.add("correct");
         } else {
-            testFeedback.textContent = `Incorrect. Answer is: ${correctAns}`; testFeedback.classList.add("incorrect");
+            testFeedback.innerHTML = `Incorrect. Answer is: ${correctAns} ${memeHtml}`; testFeedback.classList.add("incorrect");
         }
     }
-    setTimeout(nextTestQuestion, isCorrect ? 1000 : 2500);
+    setTimeout(nextTestQuestion, isCorrect ? 1500 : 2500);
 }
 
 testSubmitBtn.addEventListener("click", () => {
