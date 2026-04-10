@@ -536,20 +536,26 @@ function nextLearnQuestion() {
 // System Meme Storage (Using Imgur & Imgflip to bypass Giphy 'Content Not Available' hotlink blocks)
 const memes = {
     correct: [
-        "https://i.imgflip.com/1bij.jpg", // Success kid
-        "https://i.imgflip.com/39t1o.jpg", // Leo cheers
         "https://i.imgur.com/YPT5N.gif", // Yes kid gif
         "https://i.imgur.com/nxdzH1K.gif", // Obama thumbs up gif
         "https://i.imgur.com/FNBQ7.gif", // Leo applause gif
-        "https://i.imgur.com/Jz8b7.jpg" // Success baby alt
+        "https://i.imgur.com/w4kS5.gif", // Carlton dance gif
+        "https://i.imgur.com/VIfh3bY.gif", // Shia LaBeouf magic
+        "https://i.imgur.com/3ZRPu.gif", // Nodding approval
+        "https://i.imgur.com/4qG2I.gif", // Jonah Hill YES
+        "https://i.imgur.com/tBv0Q.gif", // Minions cheering
+        "https://i.imgur.com/8QjR2.gif" // Spongebob rainbow
     ],
     incorrect: [
-        "https://i.imgflip.com/1jwhww.jpg", // Picard facepalm
-        "https://i.imgflip.com/4dbtl.jpg", // Grumpy cat no
-        "https://i.imgflip.com/1h7in3.jpg", // Confused Nick Young
         "https://i.imgur.com/iWKad22.gif", // Facepalm anime gif
         "https://i.imgur.com/qFj6w.gif", // Nope cat gif
-        "https://i.imgur.com/13wE93l.gif" // Crying meme gif
+        "https://i.imgur.com/13wE93l.gif", // Crying meme gif
+        "https://i.imgur.com/MLM8V.gif", // Picard facepalm gif
+        "https://i.imgur.com/tL803L9.gif", // Michael Scott NO NO NO gif
+        "https://i.imgur.com/5XvPj.gif", // Crying baby gif
+        "https://i.imgur.com/WbKzI.gif", // Disappointed crowd
+        "https://i.imgur.com/4XZ1k.gif", // Homer disappearing
+        "https://i.imgur.com/2sOMQ.gif"  // Falling panda/fail
     ]
 };
 
