@@ -532,8 +532,40 @@ function nextLearnQuestion() {
     }
 }
 
+// System Meme Storage
+const memes = {
+    correct: [
+        "https://media.giphy.com/media/xT0BKL21U5nnlW4m6k/giphy.gif",
+        "https://media.giphy.com/media/cO39srN2EUIRaVqaVq/giphy.gif",
+        "https://media.giphy.com/media/11ISwbgCxEzMyY/giphy.gif", // Leonardo DiCaprio win
+        "https://media.giphy.com/media/nxxZv208h42EubyS3i/giphy.gif", // Obama thumbs up
+        "https://media.giphy.com/media/26hirEPeos6yGJZok/giphy.gif", // Baby fist pump
+        "https://media.giphy.com/media/3o72FcJmLzIdYJqwXm/giphy.gif", // Will Ferrell yes
+        "https://media.giphy.com/media/xT0xezQGU5xCDJuCPe/giphy.gif", // Minions cheer
+        "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif"  // Carlton dance
+    ],
+    incorrect: [
+        "https://media.giphy.com/media/1xpCuQhMhHzZ0B12z4/giphy.gif",
+        "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif",
+        "https://media.giphy.com/media/8UGoOaR1lA1uaAN892/giphy.gif", // Michael Scott facepalm
+        "https://media.giphy.com/media/l41Ym49ppcDP6iY3C/giphy.gif", // Cat facepalm
+        "https://media.giphy.com/media/3o6Zt62PeJeFUDwBUI/giphy.gif", // Nope nope nope
+        "https://media.giphy.com/media/xT5LMzIK1AdZJ4cYW4/giphy.gif", // Homer hide in bush
+        "https://media.giphy.com/media/12Msh5VHHsBIfS/giphy.gif", // Monkey confused
+        "https://media.giphy.com/media/kC2cRqEt8o41RoEzN5/giphy.gif" // Crying cat
+    ]
+};
+
+function getRandomMeme(isCorrect) {
+    const list = isCorrect ? memes.correct : memes.incorrect;
+    const url = list[Math.floor(Math.random() * list.length)];
+    // Fallback if users add local images to folder: return `memes/${isCorrect ? 'correct' : 'incorrect'}/1.gif` etc.
+    return `<img src="${url}" alt="meme feedback" style="max-height: 120px; border-radius: 8px; margin-top: 10px; display: block; margin-left: auto; margin-right: auto;" />`;
+}
+
 function checkLearnAnswer(btn, selectedAns, correctAns, type) {
     const isCorrect = isAnswerMatch(selectedAns, correctAns);
+    const memeHtml = getRandomMeme(isCorrect);
     
     if(type === "mc") {
         const buttons = learnOptions.querySelectorAll("button");
@@ -546,17 +578,20 @@ function checkLearnAnswer(btn, selectedAns, correctAns, type) {
             buttons.forEach(b => { if(isAnswerMatch(b.textContent, correctAns)) b.classList.add("correct"); });
             learnQueue.push(currentLearnWord); // return to queue to learn again
         }
+        // Thêm Meme vào đầu tuỳ chọn
+        learnOptions.insertAdjacentHTML("beforebegin", memeHtml);
     } else {
         learnFeedback.classList.remove("hidden", "correct", "incorrect");
         if (isCorrect) {
-            learnFeedback.textContent = "Correct!"; learnFeedback.classList.add("correct");
+            learnFeedback.innerHTML = `Correct! ${memeHtml}`; learnFeedback.classList.add("correct");
         } else {
             learnErrors++;
-            learnFeedback.textContent = `Incorrect. Answer is: ${correctAns}`; learnFeedback.classList.add("incorrect");
+            learnFeedback.innerHTML = `Incorrect. Answer is: ${correctAns} ${memeHtml}`; learnFeedback.classList.add("incorrect");
             learnQueue.push(currentLearnWord);
         }
     }
-    setTimeout(nextLearnQuestion, isCorrect ? 1000 : 2000);
+    // Kéo dài thời gian hiển thị khi xem Meme
+    setTimeout(nextLearnQuestion, isCorrect ? 1500 : 2500);
 }
 
 learnSubmitBtn.addEventListener("click", () => {
