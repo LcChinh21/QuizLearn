@@ -9,14 +9,14 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing word' });
         }
 
-        const systemPrompt = `Bạn là người phiên dịch các từ tiếng Anh sang tiếng Việt. Mục tiêu và nhiệm vụ:
-- Dịch chính xác từ tiếng Anh sang tiếng Việt, chỉ rõ từ gốc nếu cần.
-- Đưa ra 2-3 ví dụ ngắn gọn, dễ hiểu về cách sử dụng.
-- Giải thích ngắn gọn sắc thái (trang trọng, lóng,...).
-Quy tắc:
-1. Định dạng đúng: '${word}' : 'Nghĩa tiếng Việt'. (Nếu có nhiều nghĩa thì phân cách bằng dấu phẩy) VD: 'Run' : 'Chạy, vận hành'.
-2. List ví dụ bằng gạch đầu dòng cực kỳ ngắn gọn. (Tiếng anh trước rồi tiếng Việt) VD: - Run a business: Điều hành một doanh nghiệp.
-3. Không giải thích dài dòng hàn lâm.`;
+        const systemPrompt = `Bạn là biên dịch viên tiếng Anh sang tiếng Việt. Mục tiêu:
+- Dịch chính xác, 2-3 ví dụ ngắn, sắc thái ngắn gọn.
+Quy tắc định dạng TRẢ LỜI NGHIÊM NGẶT (Không dùng dấu nháy đơn/kép bao quanh nghĩa, mọi câu đều kết thúc bằng dấu chấm):
+Cách hiển thị:
+${word}: Nghĩa 1, Nghĩa 2.
+- Câu ví dụ tiếng Anh 1: Nghĩa tiếng Việt.
+- Câu ví dụ tiếng Anh 2: Nghĩa tiếng Việt.
+Sắc thái: (Ghi ngắn gọn sắc thái tại đây).`;
 
         const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY; 
         if (!apiKey) {

@@ -363,32 +363,53 @@ geminiBtn.addEventListener("click", async () => {
             // -- Format AI Result for UI --
             let formattedHtml = "";
             let lines = meaning.split('\n').filter(l => l.trim() !== '');
+            
             lines.forEach((line, idx) => {
+                // Xử lý dòng Nghĩa đầu tiên (Từ: Nghĩa)
                 if (idx === 0 && line.includes(':')) {
                     let parts = line.split(':');
                     let w = parts[0].trim().replace(/^['"*\s]+|['"*\s]+$/g, '');
                     let m = parts.slice(1).join(':').trim().replace(/^['"*\s]+|['"*\s]+$/g, '');
-                    formattedHtml += `<div style="margin-bottom: 12px; font-size: 1.2rem;"><span style="background: var(--primary-color, #4255ff); color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; margin-right: 8px;">${w}</span><span style="font-weight: bold; color: #2c3e50;">${m}</span></div>`;
-                } else if (line.trim().startsWith('-')) {
+                    if (!m.endsWith('.')) m += '.'; 
+                    // Chữ 'm' đã được xóa nháy thừa ở đầu đuôi và gắn thêm chấm nếu chưa có
+                    
+                    formattedHtml += `<div style="margin-bottom: 12px; font-size: 1.2rem; display: flex; align-items: baseline;">
+                        <span style="background: var(--primary-color, #4255ff); color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; margin-right: 8px;">${w}</span>
+                        <span style="font-weight: bold; color: #2c3e50;">${m}</span>
+                    </div>`;
+                    
+                } 
+                // Xử lý dòng Ví dụ
+                else if (line.trim().startsWith('-')) {
                     let content = line.replace(/^-/, '').trim();
+                    if (!content.endsWith('.')) content += '.';
+                    
                     if (content.includes(':')) {
                         let cParts = content.split(':');
                         formattedHtml += `<div style="margin: 8px 0 8px 15px; padding-left: 12px; border-left: 4px solid #f39c12; color: #34495e; line-height: 1.5;"><strong>${cParts[0].trim()}</strong>: ${cParts.slice(1).join(':').trim()}</div>`;
                     } else {
                         formattedHtml += `<div style="margin: 8px 0 8px 15px; padding-left: 12px; border-left: 4px solid #f39c12; color: #34495e; line-height: 1.5;">${content}</div>`;
                     }
-                } else {
-                    formattedHtml += `<div style="margin-top: 12px; font-size: 0.95rem; font-style: italic; color: #7f8c8d; background: #e8ecef; padding: 8px 12px; border-radius: 6px;"><i class="fas fa-info-circle"></i> ${line.replace(/\*\*/g, '')}</div>`;
+                } 
+                // Xử lý dòng Sắc thái (hoặc dòng phụ khác)
+                else {
+                    let text = line.replace(/\*\*/g, '').trim();
+                    if (!text.endsWith('.')) text += '.';
+                    formattedHtml += `<div style="margin-top: 12px; font-size: 0.95rem; font-style: italic; color: #7f8c8d; background: #e8ecef; padding: 8px 12px; border-radius: 6px;"><i class="fas fa-info-circle"></i> ${text}</div>`;
                 }
             });
             aiResultBox.innerHTML = formattedHtml;
 
-            // Optionally auto-fill the add word form for convenience:
+            // Tự động điền vào Input để add từ
             newWordInput.value = word;
-            // Extract just the translation part roughly for the meaning input
-            const firstLine = meaning.split('\n')[0];
-            const meaningPart = firstLine.split(':')[1]?.trim().replace(/^'|'$/g, '').trim() || "";
-            if(meaningPart) newMeaningInput.value = meaningPart;
+            
+            // Xử lý tách riêng đoạn nghĩa
+            const firstLine = lines[0] || "";
+            if (firstLine.includes(':')) {
+                // Tách nghĩa sạch nhất có thể
+                let rawMeaning = firstLine.split(':')[1].trim().replace(/^['"*\s]+|['"*\s.]+$/g, '').trim();
+                newMeaningInput.value = rawMeaning;
+            }
         } else {
             aiResultBox.innerHTML = "Không tìm thấy nghĩa của từ này.";
         }
