@@ -351,7 +351,8 @@ geminiBtn.addEventListener("click", async () => {
         });
 
         if (!response.ok) {
-            throw new Error(`Lỗi HTTP: ${response.status}`);
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(`Lỗi HTTP: ${response.status} - ${errData.error || errData.details || ''}`);
         }
 
         const data = await response.json();

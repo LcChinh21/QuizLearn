@@ -19,9 +19,9 @@ Quy tắc:
 3. Không giải thích dài dòng hàn lâm.
 Từ cần dịch: "${word}"`;
 
-        const apiKey = process.env.GEMINI_API_KEY; // Lấy key từ Vercel Environment Variables
+        const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY; // Lấy key từ Vercel Environment Variables
         if (!apiKey) {
-             return res.status(500).json({ error: 'Missing GEMINI_API_KEY in environment' });
+             return res.status(500).json({ error: 'Missing GEMINI_API_KEY in environment. Vui lòng thêm biến môi trường này vào Vercel.' });
         }
 
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, {
@@ -40,7 +40,7 @@ Từ cần dịch: "${word}"`;
         res.status(200).json(data);
 
     } catch (error) {
-        console.error('API Error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error('API Error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 }
