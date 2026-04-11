@@ -1,6 +1,7 @@
 // ----- Data Management -----
 let supabaseClient = null;
 const SUPABASE_TABLE = "study_sets"; // Tên bảng lưu từ vựng trong CSDL
+const USERS_TABLE = "quizlearn_users"; // Table users
 let isSupabaseLoaded = false;
 
 async function setupSupabase() {
@@ -47,6 +48,13 @@ async function loadData() {    await setupSupabase();    if (supabaseClient) {
             } else {
                 migrateInitial();
             }
+            
+            // Load Users
+            const { data: usersData, error: usersErr } = await supabaseClient.from(USERS_TABLE).select('*');
+            if (!usersErr && usersData) {
+                usersDb = usersData;
+                localStorage.setItem("quizlearn_users", JSON.stringify(usersDb));
+            }
         } catch (e) {
             console.warn("Không thể tải Supabase, dùng LocalStorage.", e);
             migrateInitial();
@@ -84,7 +92,8 @@ async function saveData() {
             const rowData = { 
                 id: appData[idx].id, 
                 name: appData[idx].name, 
-                words: appData[idx].words 
+                words: appData[idx].words,
+                author: appData[idx].author || null 
             };
             // Upsert (C?p nh?t ho?c Chn m?i)
             await supabaseClient.from(SUPABASE_TABLE).upsert(rowData);
@@ -97,7 +106,8 @@ async function saveSetToSupabase(newSet) {    await setupSupabase();    if (supa
         await supabaseClient.from(SUPABASE_TABLE).upsert({
             id: newSet.id,
             name: newSet.name,
-            words: newSet.words
+            words: newSet.words,
+            author: newSet.author || null
         });
     }
 }
@@ -256,7 +266,7 @@ document.getElementById("go-to-login").addEventListener("click", (e) => {
 });
 
 // Perform Register
-document.getElementById("do-register-btn").addEventListener("click", () => {
+document.getElementById("do-register-btn").addEventListener("click", async () => {
     const user = document.getElementById("reg-username").value.trim();
     const disp = document.getElementById("reg-displayname").value.trim();
     const pass = document.getElementById("reg-password").value.trim();
@@ -270,6 +280,17 @@ document.getElementById("do-register-btn").addEventListener("click", () => {
     const newUser = { username: user, displayName: disp, password: pass, avatar: "" };
     usersDb.push(newUser);
     localStorage.setItem("quizlearn_users", JSON.stringify(usersDb));
+    
+    await setupSupabase();
+    if(supabaseClient) {
+        await supabaseClient.from(USERS_TABLE).insert([{
+            username: user,
+            displayName: disp,
+            password: pass,
+            avatar: ""
+        }]);
+    }
+
     alert("Đăng ký thành công! Vui lòng đăng nhập.");
     
     document.getElementById("reg-username").value = "";
@@ -298,20 +319,27 @@ document.getElementById("do-login-btn").addEventListener("click", () => {
 });
 
 // Update Profile
-document.getElementById("do-update-profile-btn").addEventListener("click", () => {
+document.getElementById("do-update-profile-btn").addEventListener("click", async () => {
     if(!currentUser) return;
     const newAvt = document.getElementById("prof-avatar-url").value.trim();
     const newPass = document.getElementById("prof-new-password").value.trim();
 
     const idx = usersDb.findIndex(u => u.username === currentUser.username);
     if(idx !== -1) {
-        if(newAvt) usersDb[idx].avatar = newAvt;
-        if(newPass) usersDb[idx].password = newPass;
+        if(newAvt !== "") usersDb[idx].avatar = newAvt;
+        if(newPass !== "") usersDb[idx].password = newPass;
 
         currentUser = usersDb[idx];
         localStorage.setItem("quizlearn_users", JSON.stringify(usersDb));
         localStorage.setItem("quizlearn_currentUser", JSON.stringify(currentUser));
         
+        await setupSupabase();
+        if(supabaseClient) {
+            await supabaseClient.from(USERS_TABLE)
+                .update({ avatar: currentUser.avatar, password: currentUser.password })
+                .eq('username', currentUser.username);
+        }
+
         document.getElementById("prof-new-password").value = "";
         alert("Cập nhật Profile thành công!");
         updateAuthUI();
