@@ -344,11 +344,15 @@ let testTotal = 0;
 // ----- Navigation -----
 navBtns.forEach(btn => {
     btn.addEventListener("click", () => {
+        const targetId = btn.getAttribute("data-target");
+        if (!targetId || targetId === "undefined" || targetId === null) return;
+        
         navBtns.forEach(b => b.classList.remove("active"));
         sections.forEach(s => s.classList.add("hidden"));
         btn.classList.add("active");
-        const targetId = btn.getAttribute("data-target");
-        document.getElementById(targetId).classList.remove("hidden");
+        
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) targetSection.classList.remove("hidden");
         
         if(targetId === "dashboard-section") {
             renderDashboard();
