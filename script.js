@@ -268,6 +268,62 @@ document.getElementById("create-set-btn").addEventListener("click", async () => 
     }
 });
 
+document.getElementById("generate-set-btn").addEventListener("click", async () => {
+    if (!checkPassword()) return;
+    let topicInput = document.getElementById("ai-topic-name");
+    let countInput = document.getElementById("ai-word-count");
+    let topic = topicInput.value.trim();
+    let count = parseInt(countInput.value, 10) || 10;
+    
+    if (!topic) {
+        alert("Please enter a topic to auto-generate.");
+        return;
+    }
+
+    const btn = document.getElementById("generate-set-btn");
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    btn.disabled = true;
+
+    try {
+        const response = await fetch('/api/generate', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ topic, count })
+        });
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(`HTTP: ${response.status} - ${errData.error || errData.details || ''}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.words && Array.isArray(data.words) && data.words.length > 0) {
+            let newSet = { id: Date.now(), name: `Topic: ${topic}`, words: data.words };
+            appData.unshift(newSet); // Put at the top of the dashboard
+            localStorage.setItem("quizlet_data", JSON.stringify(appData));
+            
+            topicInput.value = "";
+            renderDashboard();
+            
+            // Cập nhật trên Cloud
+            if (typeof saveSetToSupabase === 'function') {
+                await saveSetToSupabase(newSet);
+            }
+        } else {
+            alert("Không thể tạo danh sách từ vựng. Vui lòng thử lại.");
+        }
+    } catch (error) {
+        console.error("Generate API Error:", error);
+        alert(`Lỗi khi tạo topic: ${error.message}`);
+    } finally {
+        // Render lại UI (trường hợp thay đổi hoặc reset button)
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
 window.deleteSet = async function(id) {
     if (!checkPassword()) return;
     if(confirm("Are you sure you want to delete this study set?")) {
