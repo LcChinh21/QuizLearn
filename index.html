@@ -56,9 +56,10 @@
                     <div id="profile-view" class="hidden">
                         <h4 style="margin-bottom: 10px; color: #8e44ad;"><i class="fas fa-id-card"></i> Profile</h4>
                         <div style="text-align: center; margin-bottom: 10px;">
-                            <img id="profile-avatar-preview" src="" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #bdc3c7;">
+                            <img id="profile-avatar-preview" src="" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #bdc3c7; object-fit: cover;">
                         </div>
-                        <input type="text" id="prof-avatar-url" placeholder="New Avatar Image URL..." class="auth-input">
+                        <label for="prof-avatar-upload" style="display: block; font-size: 0.85rem; color: #7f8c8d; margin-bottom: 5px;">Upload Avatar (Image)</label>
+                        <input type="file" id="prof-avatar-upload" accept="image/*" class="auth-input" style="padding: 6px;">
                         <input type="password" id="prof-new-password" placeholder="New Password..." class="auth-input">
                         <button id="do-update-profile-btn" class="primary-btn auth-submit-btn" style="background-color: #8e44ad; margin-bottom: 8px;">Save Changes</button>
                         <button id="do-logout-btn" class="primary-btn auth-submit-btn" style="background-color: var(--error-color);">Logout</button>

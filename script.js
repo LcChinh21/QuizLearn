@@ -225,7 +225,8 @@ function updateAuthUI() {
 
         // Set edit profile placeholders
         document.getElementById("profile-avatar-preview").src = avatarImg.src;
-        document.getElementById("prof-avatar-url").value = currentUser.avatar || "";
+        document.getElementById("profile-avatar-preview").dataset.avatarUrl = currentUser.avatar || ""; // Khôi phục trạng thái ban đầu
+        document.getElementById("prof-avatar-upload").value = ""; // Clear file input
     } else {
         btnText.textContent = "Login";
         iconDisplay.style.display = "inline-block";
@@ -318,14 +319,35 @@ document.getElementById("do-login-btn").addEventListener("click", () => {
     updateAuthUI();
 });
 
+// User Upload Avatar
+document.getElementById("prof-avatar-upload").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    
+    // Convert to Base64 to store and preview
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const base64Str = event.target.result;
+        document.getElementById("profile-avatar-preview").src = base64Str;
+        document.getElementById("profile-avatar-preview").dataset.avatarUrl = base64Str; // cache the new Base64 string
+    };
+    reader.readAsDataURL(file);
+});
+
 // Update Profile
 document.getElementById("do-update-profile-btn").addEventListener("click", async () => {
     if(!currentUser) return;
-    const newAvt = document.getElementById("prof-avatar-url").value.trim();
+    const btn = document.getElementById("do-update-profile-btn");
+    const originalText = btn.innerHTML;
+    
+    const newAvt = document.getElementById("profile-avatar-preview").dataset.avatarUrl || "";
     const newPass = document.getElementById("prof-new-password").value.trim();
 
     const idx = usersDb.findIndex(u => u.username === currentUser.username);
     if(idx !== -1) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        btn.disabled = true;
+
         if(newAvt !== "") usersDb[idx].avatar = newAvt;
         if(newPass !== "") usersDb[idx].password = newPass;
 
@@ -335,11 +357,18 @@ document.getElementById("do-update-profile-btn").addEventListener("click", async
         
         await setupSupabase();
         if(supabaseClient) {
-            await supabaseClient.from(USERS_TABLE)
-                .update({ avatar: currentUser.avatar, password: currentUser.password })
-                .eq('username', currentUser.username);
+            try {
+                await supabaseClient.from(USERS_TABLE)
+                    .update({ avatar: currentUser.avatar, password: currentUser.password })
+                    .eq('username', currentUser.username);
+            } catch (error) {
+                console.error("Lỗi khi update Supabase:", error);
+            }
         }
 
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
         document.getElementById("prof-new-password").value = "";
         alert("Cập nhật Profile thành công!");
         updateAuthUI();
