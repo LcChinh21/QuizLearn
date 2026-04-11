@@ -383,29 +383,85 @@ function renderDashboard() {
         let card = document.createElement("div");
         card.className = "set-card";
         card.onclick = (e) => {
-            if(e.target.closest('.delete-set-btn')) return;
+            if(e.target.closest('.delete-set-btn') || e.target.closest('.edit-set-btn')) return;
             openSet(set.id);
         };
-        card.innerHTML = `
-            <div>
-                <div class="set-card-title">${set.name}</div>
-                <div class="set-card-count">${set.words.length} terms</div>
-            </div>
-            <div class="set-card-footer">
+        
+        let authorHtml = '';
+        if (set.author) {
+            authorHtml = `
+                <div style="display: flex; align-items: center; gap: 8px; float: right;">
+                    <img src="${set.author.avatar}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
+                    <span style="font-size: 0.9rem; font-weight: bold; color: var(--text-light);">${set.author.displayName}</span>
+                </div>
+            `;
+        }
+
+        // Show buttons only if admin OR user is the author
+        let controlsHtml = '';
+        if (isAuthenticated || (currentUser && set.author && set.author.username === currentUser.username)) {
+            controlsHtml = `
+                <button class="edit-set-btn" onclick="editSet(${set.id})" title="Edit set name" style="margin-right: 10px; border: none; background: none; color: #4255ff; cursor: pointer; font-size: 1.1rem;"><i class="fas fa-edit"></i></button>
                 <button class="delete-set-btn" onclick="deleteSet(${set.id})" title="Delete set"><i class="fas fa-trash"></i></button>
-                <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+            `;
+        }
+
+        card.innerHTML = `
+            <div style="margin-bottom: 12px;">
+                <div class="set-card-title" style="display: inline-block;">${set.name}</div>
+                ${authorHtml}
+            </div>
+            <div>
+                <div class="set-card-count" style="display: inline-block;">${set.words.length} terms</div>
+            </div>
+            <div class="set-card-footer" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                ${controlsHtml}
+                <i class="fas fa-chevron-right" style="color: var(--text-light); margin-left: 10px;"></i>
             </div>
         `;
         grid.appendChild(card);
     });
 }
 
+window.editSet = async function(id) {
+    if (!checkPassword()) return;
+    let setObj = appData.find(s => s.id === id);
+    if (!setObj) return;
+
+    // Additional check just to be safe
+    if (!isAuthenticated && (!currentUser || !setObj.author || setObj.author.username !== currentUser.username)) {
+        alert("You do not have permission to edit this set.");
+        return;
+    }
+
+    let newName = prompt("Enter new name for the set:", setObj.name);
+    if (newName && newName.trim() !== "") {
+        setObj.name = newName.trim();
+        localStorage.setItem("quizlet_data", JSON.stringify(appData));
+        renderDashboard();
+        
+        await setupSupabase();
+        if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+            await supabaseClient.from(SUPABASE_TABLE).update({ name: setObj.name }).eq('id', id);
+        }
+    }
+};
+
 document.getElementById("create-set-btn").addEventListener("click", async () => {
     if (!checkPassword()) return;
     let nameInput = document.getElementById("new-set-name");
     let name = nameInput.value.trim();
     if(name) {
-        let newSet = { id: Date.now(), name: name, words: [] };
+        let newSet = { 
+            id: Date.now(), 
+            name: name, 
+            words: [],
+            author: currentUser ? {
+                username: currentUser.username,
+                displayName: currentUser.displayName,
+                avatar: currentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=random`
+            } : null
+        };
         appData.push(newSet);
         localStorage.setItem("quizlet_data", JSON.stringify(appData));
         nameInput.value = "";
@@ -452,7 +508,16 @@ document.getElementById("generate-set-btn").addEventListener("click", async () =
         const data = await response.json();
         
         if (data.words && Array.isArray(data.words) && data.words.length > 0) {
-            let newSet = { id: Date.now(), name: `Topic: ${topic}`, words: data.words };
+            let newSet = { 
+                id: Date.now(), 
+                name: `Topic: ${topic}`, 
+                words: data.words,
+                author: currentUser ? {
+                    username: currentUser.username,
+                    displayName: currentUser.displayName,
+                    avatar: currentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=random`
+                } : null
+            };
             appData.unshift(newSet); // Put at the top of the dashboard
             localStorage.setItem("quizlet_data", JSON.stringify(appData));
             
