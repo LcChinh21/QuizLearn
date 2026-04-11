@@ -446,10 +446,25 @@ function renderDashboard() {
         
         let authorHtml = '';
         if (set.author) {
+            let authorName = set.author.displayName || set.author.username;
+            let realUser = usersDb.find(u => u.username === set.author.username);
+            let authorAvatar = realUser && realUser.avatar 
+                ? realUser.avatar 
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`;
+            
+            let dateHtml = "";
+            if (set.author.createdAt) {
+                let d = new Date(set.author.createdAt);
+                dateHtml = `<div style="font-size: 0.75rem; color: #95a5a6; margin-top: 2px; text-align: right;">${d.toLocaleDateString('vi-VN')}</div>`;
+            }
+
             authorHtml = `
-                <div style="display: flex; align-items: center; gap: 8px; float: right;">
-                    <img src="${set.author.avatar}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
-                    <span style="font-size: 0.9rem; font-weight: bold; color: var(--text-light);">${set.author.displayName}</span>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; float: right;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <img src="${authorAvatar}" alt="Avatar" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 0.9rem; font-weight: bold; color: var(--text-light);">${authorName}</span>
+                    </div>
+                    ${dateHtml}
                 </div>
             `;
         }
@@ -516,7 +531,7 @@ document.getElementById("create-set-btn").addEventListener("click", async () => 
             author: currentUser ? {
                 username: currentUser.username,
                 displayName: currentUser.displayName,
-                avatar: currentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=random`
+                createdAt: Date.now()
             } : null
         };
         appData.push(newSet);
