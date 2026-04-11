@@ -178,18 +178,13 @@ const testScoreText = document.getElementById("test-score-text");
 const testResultDetails = document.getElementById("test-result-details");
 
 // ----- State -----
-let isAuthenticated = false;
+let isAuthenticated = false; // Backward compatibility
 function checkPassword() {
-    if (isAuthenticated) return true;
     if (currentUser) return true; // Accept logged in user
     
-    // Nếu chưa có user thì bắt nhập pass admin cữ
-    const pwd = prompt("Vui lòng nhập mật khẩu để tiếp tục thao tác:");
-    if (pwd === "ChinhLeCute") {
-        isAuthenticated = true;
-        return true;
-    }
-    if (pwd !== null) alert("Mật khẩu không chính xác hoặc bạn chưa đăng nhập!");
+    // Nếu chưa có user thì hiển thị thông báo và mở form Đăng nhập
+    alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+    document.getElementById("auth-panel").classList.add("show");
     return false;
 }
 
