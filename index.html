@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -22,6 +22,51 @@
                 <i class="fas fa-file-alt"></i> Test
             </button>
         </nav>
+        <div class="user-auth-nav" style="margin-left: auto;">
+            <div id="auth-user-dropdown" class="auth-dropdown">
+                <button id="auth-toggle-btn" class="nav-btn" style="display: flex; align-items: center; gap: 8px;">
+                    <img id="auth-avatar-display" src="https://ui-avatars.com/api/?name=Guest&background=random" style="width: 30px; height: 30px; border-radius: 50%; display: none;">
+                    <i class="fas fa-user-circle" id="auth-icon-display"></i> 
+                    <span id="auth-display-name">Login</span>
+                </button>
+                
+                <!-- Dropdown panel -->
+                <div id="auth-panel" class="auth-panel hidden">
+                    
+                    <!-- Form đăng nhập -->
+                    <div id="login-form-view">
+                        <h4 style="margin-bottom: 10px; color: var(--primary-color);"><i class="fas fa-sign-in-alt"></i> Login</h4>
+                        <input type="text" id="login-username" placeholder="Username" class="auth-input">
+                        <input type="password" id="login-password" placeholder="Password" class="auth-input">
+                        <button id="do-login-btn" class="primary-btn auth-submit-btn">Login</button>
+                        <p class="auth-switch-text">New here? <a href="#" id="go-to-register">Register</a></p>
+                    </div>
+
+                    <!-- Form đăng ký -->
+                    <div id="register-form-view" class="hidden">
+                        <h4 style="margin-bottom: 10px; color: var(--success-color);"><i class="fas fa-user-plus"></i> Register</h4>
+                        <input type="text" id="reg-username" placeholder="Username" class="auth-input">
+                        <input type="text" id="reg-displayname" placeholder="Display Name" class="auth-input">
+                        <input type="password" id="reg-password" placeholder="Password" class="auth-input">
+                        <button id="do-register-btn" class="primary-btn auth-submit-btn" style="background-color: var(--success-color);">Register</button>
+                        <p class="auth-switch-text">Already have account? <a href="#" id="go-to-login">Login</a></p>
+                    </div>
+
+                    <!-- Form Profile (Hiện khi đã login) -->
+                    <div id="profile-view" class="hidden">
+                        <h4 style="margin-bottom: 10px; color: #8e44ad;"><i class="fas fa-id-card"></i> Profile</h4>
+                        <div style="text-align: center; margin-bottom: 10px;">
+                            <img id="profile-avatar-preview" src="" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #bdc3c7;">
+                        </div>
+                        <input type="text" id="prof-avatar-url" placeholder="New Avatar Image URL..." class="auth-input">
+                        <input type="password" id="prof-new-password" placeholder="New Password..." class="auth-input">
+                        <button id="do-update-profile-btn" class="primary-btn auth-submit-btn" style="background-color: #8e44ad; margin-bottom: 8px;">Save Changes</button>
+                        <button id="do-logout-btn" class="primary-btn auth-submit-btn" style="background-color: var(--error-color);">Logout</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </header>
 
     <main>

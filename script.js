@@ -167,18 +167,166 @@ const testResults = document.getElementById("test-results");
 const testScoreText = document.getElementById("test-score-text");
 const testResultDetails = document.getElementById("test-result-details");
 
-// State
+// ----- State -----
 let isAuthenticated = false;
 function checkPassword() {
     if (isAuthenticated) return true;
+    if (currentUser) return true; // Accept logged in user
+    
+    // Nếu chưa có user thì bắt nhập pass admin cữ
     const pwd = prompt("Vui lòng nhập mật khẩu để tiếp tục thao tác:");
     if (pwd === "ChinhLeCute") {
         isAuthenticated = true;
         return true;
     }
-    if (pwd !== null) alert("Mật khẩu không chính xác!");
+    if (pwd !== null) alert("Mật khẩu không chính xác hoặc bạn chưa đăng nhập!");
     return false;
 }
+
+// ----- User Auth Management -----
+let currentUser = null;
+let usersDb = JSON.parse(localStorage.getItem('quizlearn_users')) || [];
+
+function loadCurrentUser() {
+    let savedUser = localStorage.getItem('quizlearn_currentUser');
+    if(savedUser) {
+        currentUser = JSON.parse(savedUser);
+    }
+    updateAuthUI();
+}
+
+function updateAuthUI() {
+    const btnText = document.getElementById("auth-display-name");
+    const avatarImg = document.getElementById("auth-avatar-display");
+    const iconDisplay = document.getElementById("auth-icon-display");
+    const loginView = document.getElementById("login-form-view");
+    const regView = document.getElementById("register-form-view");
+    const profView = document.getElementById("profile-view");
+
+    if (currentUser) {
+        btnText.textContent = currentUser.displayName || currentUser.username;
+        iconDisplay.style.display = "none";
+        avatarImg.style.display = "block";
+        avatarImg.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=random`;
+        
+        loginView.classList.add("hidden");
+        regView.classList.add("hidden");
+        profView.classList.remove("hidden");
+
+        // Set edit profile placeholders
+        document.getElementById("profile-avatar-preview").src = avatarImg.src;
+        document.getElementById("prof-avatar-url").value = currentUser.avatar || "";
+    } else {
+        btnText.textContent = "Login";
+        iconDisplay.style.display = "inline-block";
+        avatarImg.style.display = "none";
+        
+        loginView.classList.remove("hidden");
+        regView.classList.add("hidden");
+        profView.classList.add("hidden");
+    }
+}
+
+// Auth Event Listeners
+document.getElementById("auth-toggle-btn").addEventListener("click", () => {
+    document.getElementById("auth-panel").classList.toggle("show");
+});
+
+// Click outside to close
+document.addEventListener("click", (e) => {
+    const panel = document.getElementById("auth-panel");
+    const dropdown = document.getElementById("auth-user-dropdown");
+    if(!dropdown.contains(e.target) && panel.classList.contains("show")) {
+        panel.classList.remove("show");
+    }
+});
+
+// Register
+document.getElementById("go-to-register").addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("login-form-view").classList.add("hidden");
+    document.getElementById("register-form-view").classList.remove("hidden");
+});
+
+// Login UI Switch
+document.getElementById("go-to-login").addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("register-form-view").classList.add("hidden");
+    document.getElementById("login-form-view").classList.remove("hidden");
+});
+
+// Perform Register
+document.getElementById("do-register-btn").addEventListener("click", () => {
+    const user = document.getElementById("reg-username").value.trim();
+    const disp = document.getElementById("reg-displayname").value.trim();
+    const pass = document.getElementById("reg-password").value.trim();
+
+    if(!user || !disp || !pass) return alert("Vui lòng điền đủ thông tin!");
+    
+    if(usersDb.find(u => u.username === user)) {
+        return alert("Username này đã tồn tại!");
+    }
+
+    const newUser = { username: user, displayName: disp, password: pass, avatar: "" };
+    usersDb.push(newUser);
+    localStorage.setItem("quizlearn_users", JSON.stringify(usersDb));
+    alert("Đăng ký thành công! Vui lòng đăng nhập.");
+    
+    document.getElementById("reg-username").value = "";
+    document.getElementById("reg-displayname").value = "";
+    document.getElementById("reg-password").value = "";
+    document.getElementById("go-to-login").click();
+});
+
+// Perform Login
+document.getElementById("do-login-btn").addEventListener("click", () => {
+    const user = document.getElementById("login-username").value.trim();
+    const pass = document.getElementById("login-password").value.trim();
+
+    const match = usersDb.find(u => u.username === user && u.password === pass);
+    if(!match) {
+        return alert("Sai Username hoặc Password!");
+    }
+
+    currentUser = match;
+    localStorage.setItem("quizlearn_currentUser", JSON.stringify(currentUser));
+    
+    document.getElementById("login-username").value = "";
+    document.getElementById("login-password").value = "";
+    document.getElementById("auth-panel").classList.remove("show");
+    updateAuthUI();
+});
+
+// Update Profile
+document.getElementById("do-update-profile-btn").addEventListener("click", () => {
+    if(!currentUser) return;
+    const newAvt = document.getElementById("prof-avatar-url").value.trim();
+    const newPass = document.getElementById("prof-new-password").value.trim();
+
+    const idx = usersDb.findIndex(u => u.username === currentUser.username);
+    if(idx !== -1) {
+        if(newAvt) usersDb[idx].avatar = newAvt;
+        if(newPass) usersDb[idx].password = newPass;
+
+        currentUser = usersDb[idx];
+        localStorage.setItem("quizlearn_users", JSON.stringify(usersDb));
+        localStorage.setItem("quizlearn_currentUser", JSON.stringify(currentUser));
+        
+        document.getElementById("prof-new-password").value = "";
+        alert("Cập nhật Profile thành công!");
+        updateAuthUI();
+    }
+});
+
+// Logout
+document.getElementById("do-logout-btn").addEventListener("click", () => {
+    currentUser = null;
+    localStorage.removeItem("quizlearn_currentUser");
+    isAuthenticated = false; // reset admin mode too
+    updateAuthUI();
+    document.getElementById("auth-panel").classList.remove("show");
+});
+
 
 let flashcardIndex = 0;
 let learnQueue = [];
@@ -760,6 +908,7 @@ document.addEventListener("keydown", (e) => {
 
 // Init (Start at Dashboard)
 function initApp() {
+    loadCurrentUser();
     try {
         renderDashboard();
         if(tabDashboard) tabDashboard.click();

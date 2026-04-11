@@ -255,6 +255,64 @@ header {
     background-color: rgba(66, 85, 255, 0.1);
 }
 
+/* --- User Auth Dropdown --- */
+.auth-dropdown {
+    position: relative;
+    display: inline-block;
+}
+.auth-panel {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 10px;
+    background: white;
+    width: 280px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    padding: 20px;
+    z-index: 100;
+    border: 1px solid var(--border-color);
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+.auth-panel.show {
+    display: flex;
+}
+.auth-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #dce4ec;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+}
+.auth-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(66, 85, 255, 0.1);
+}
+.auth-submit-btn {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+}
+.auth-switch-text {
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--text-light);
+    margin-top: 10px;
+}
+.auth-switch-text a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+.hidden {
+    display: none !important;
+}
+
 main {
     max-width: 900px;
     margin: 2rem auto;
