@@ -60,11 +60,21 @@ body {
 
     .logo {
         font-size: 1.4rem;
+        flex: none !important;
+        justify-content: center;
     }
 
     .nav-links {
         width: 100%;
         gap: 0.3rem;
+        flex: none !important;
+        justify-content: center !important;
+        overflow-x: auto;
+    }
+
+    .user-auth-nav {
+        flex: none !important;
+        justify-content: center !important;
     }
 
     .nav-btn {

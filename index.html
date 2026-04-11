@@ -9,8 +9,8 @@
 </head>
 <body>
     <header>
-        <div class="logo"><i class="fas fa-book-open"></i> QuizzLearn</div>
-        <nav class="nav-links">
+        <div class="logo" style="flex: 1;"><i class="fas fa-book-open"></i> QuizzLearn</div>
+        <nav class="nav-links" style="flex: 2; justify-content: center;">
             <button class="nav-btn active" id="tab-dashboard" data-target="dashboard-section"><i class="fas fa-chart-pie"></i> Sets</button>
             <button class="nav-btn hidden" data-target="flashcards-section" id="tab-flashcards">
                 <i class="fas fa-clone"></i> Flashcards
@@ -22,7 +22,7 @@
                 <i class="fas fa-file-alt"></i> Test
             </button>
         </nav>
-        <div class="user-auth-nav" style="margin-left: auto;">
+        <div class="user-auth-nav" style="flex: 1; display: flex; justify-content: flex-end;">
             <div id="auth-user-dropdown" class="auth-dropdown">
                 <button id="auth-toggle-btn" class="nav-btn" style="display: flex; align-items: center; gap: 8px;">
                     <img id="auth-avatar-display" src="https://ui-avatars.com/api/?name=Guest&background=random" style="width: 30px; height: 30px; border-radius: 50%; display: none;">
