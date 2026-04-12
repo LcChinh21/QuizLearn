@@ -42,7 +42,7 @@ Các trạng thái của từ: (Các dạng chia từ).`;
                 "Authorization": `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "llama-3.1-8b-instant",
+                model: "llama-3.3-70b-versatile",
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: userPrompt }
