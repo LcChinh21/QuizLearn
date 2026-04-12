@@ -16,10 +16,10 @@ Cách hiển thị:
 ${word}: Nghĩa 1, Nghĩa 2.
 - Câu ví dụ tiếng Anh 1: Nghĩa tiếng Việt.
 - Câu ví dụ tiếng Anh 2: Nghĩa tiếng Việt.
+VD: - He is running fast: Anh ấy đang chạy nhanh.
 Sắc thái: (Ghi ngắn gọn sắc thái tại đây).
 Lưu ý: 
 Câu ví dụ tiếng anh phải là 1 câu tiếng anh
-VD: - He is running fast: Anh ấy đang chạy nhanh.
 word ở đây là từ gốc nếu đang không ở từ gốc ví dụ từ "running" thì word sẽ là "run". Nếu đang ở từ gốc thì word vẫn là "run".`;
 
         const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY; 
