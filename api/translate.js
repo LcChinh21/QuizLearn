@@ -22,6 +22,7 @@ CÁC QUY TẮC BẮT BUỘC:
 
 KHUÔN MẪU PHẢN HỒI:
 ${word}: Nghĩa 1, Nghĩa 2.
+- Từ gốc: word ở dạng nguyên thể (infinitive).
 - [English sentence]: [Câu tiếng Việt].
 - [English sentence]: [Câu tiếng Việt].
 Sắc thái: (Ngắn gọn).
