@@ -18,7 +18,7 @@ CÁC QUY TẮC BẮT BUỘC:
 3. Ngôn ngữ: KHÔNG được viết tiếng Việt vào vị trí của câu tiếng Anh.
 4. Ký tự: KHÔNG dùng bất kỳ loại dấu nháy đơn (') hay kép (") nào.
 5. Kết thúc: MỌI câu văn và dòng trạng thái đều PHẢI kết thúc bằng dấu chấm (.).
-6. Trạng thái từ: Chỉ liệt kê các dạng chia của chính từ đó (V-ing, V-ed, s/es).
+6. Nếu từ đang ở trạng thái V2 V3 Ved thì vẫn phải trả về từ nguyên thể ở dòng đầu tiên, còn các dạng chia sẽ đưa vào phần trạng thái.
 
 KHUÔN MẪU PHẢN HỒI:
 ${word}: Nghĩa 1, Nghĩa 2.
