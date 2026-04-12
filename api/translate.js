@@ -18,7 +18,10 @@ ${word}: Nghĩa 1, Nghĩa 2.
 - English Example: Nghĩa tiếng Việt.
 (VD: - He is running fast: Anh ấy đang chạy nhanh.)
 Sắc thái: (Ghi ngắn gọn sắc thái tại đây).
-Lưu ý: 
+Các trạng thái của từ: (Nếu có, ghi ngắn gọn tại đây).
+Lưu ý:
+Nghĩa tiếng Việt phải ngắn gọn, súc tích, sát với ngữ cảnh của từ.
+Câu ví dụ tiếng Việt phải là 1 câu tiếng Việt, có đầy đủ chủ ngữ và vị ngữ, không được là cụm từ rời rạc.
 Câu ví dụ tiếng anh phải là 1 câu tiếng anh
 word ở đây là từ gốc nếu đang không ở từ gốc ví dụ từ "running" thì word sẽ là "run". Nếu đang ở từ gốc thì word vẫn là "run".`;
 
