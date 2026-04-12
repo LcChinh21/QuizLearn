@@ -19,6 +19,8 @@ Quy tắc định dạng TRẢ LỜI NGHIÊM NGẶT:
 - Từ vựng phải từ mức độ B1 đến C1. Nghĩa tiếng Việt giải thích sát với ngữ cảnh chủ đề.
 - Chắc chắn rằng mảng JSON là hợp lệ để dùng JSON.parse. Không trả về thêm bất kì bình luận, ký tự nào khác.`;
 
+        const userPrompt = `Tạo danh sách ${vocabCount} từ vựng về chủ đề: "${topic}" Dưới dạng mảng JSON.`;
+
         const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY; 
         if (!apiKey) {
              return res.status(500).json({ error: 'Missing GROQ_API_KEY in environment.' });
@@ -35,7 +37,7 @@ Quy tắc định dạng TRẢ LỜI NGHIÊM NGẶT:
                 model: "llama-3.3-70b-versatile",
                 messages: [
                     { role: "system", content: systemPrompt },
-                    { role: "user", content: `Tạo danh sách ${vocabCount} từ vựng về chủ đề: "${topic}" Dưới dạng mảng JSON.` }
+                    { role: "user", content: userPrompt }
                 ],
                 temperature: 0.7
             })

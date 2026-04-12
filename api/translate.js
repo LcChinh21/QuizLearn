@@ -9,23 +9,25 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing word' });
         }
 
-        const systemPrompt = `Bạn là một công cụ trích xuất từ điển Anh-Việt chính xác. 
-NHIỆM VỤ: Dịch từ được yêu cầu và trả về định dạng văn bản thuần túy.
+        const systemPrompt = `Bạn là một công cụ hỗ trợ học từ vựng English-Vietnamese. 
+NHIỆM VỤ: Phản hồi chính xác theo khuôn mẫu văn bản dưới đây.
 
-QUY TẮC NGHIÊM NGẶT:
-1. Định dạng:
+CÁC QUY TẮC BẮT BUỘC:
+1. Từ gốc: Dòng đầu tiên ${word} luôn là từ ở dạng nguyên thể (infinitive).
+2. Định dạng ví dụ: "- [Câu tiếng Anh]: [Câu tiếng Việt]."
+3. Ngôn ngữ: KHÔNG được viết tiếng Việt vào vị trí của câu tiếng Anh.
+4. Ký tự: KHÔNG dùng bất kỳ loại dấu nháy đơn (') hay kép (") nào.
+5. Kết thúc: MỌI câu văn và dòng trạng thái đều PHẢI kết thúc bằng dấu chấm (.).
+6. Trạng thái từ: Chỉ liệt kê các dạng chia của chính từ đó (V-ing, V-ed, s/es).
+
+KHUÔN MẪU PHẢN HỒI:
 ${word}: Nghĩa 1, Nghĩa 2.
-- [Câu ví dụ tiếng Anh]: [Dịch câu tiếng Việt đầy đủ chủ ngữ, vị ngữ].
-- [Câu ví dụ tiếng Anh]: [Dịch câu tiếng Việt đầy đủ chủ ngữ, vị ngữ].
-Sắc thái: (Mô tả ngắn gọn).
-Các trạng thái của từ: (Liệt kê các biến thể chia thì, số ít/nhiều của CHÍNH từ đó).
+- English sentence: Dịch sang tiếng Việt.
+- English sentence: Dịch sang tiếng Việt.
+Sắc thái: (Ngắn gọn).
+Các trạng thái của từ: (Các dạng chia từ).`;
 
-2. Ràng buộc kỹ thuật:
-- KHÔNG sử dụng dấu nháy đơn (') hay dấu nháy kép (") bao quanh nghĩa hay câu.
-- Mọi dòng, mọi câu đều PHẢI kết thúc bằng dấu chấm (.).
-- Phần ${word} phải là từ gốc (ví dụ: input là "reaches" thì ${word} là "reach").
-- KHÔNG viết thêm bất kỳ lời dẫn nào như "Đây là kết quả" hay "Chào bạn".
-- Các trạng thái của từ chỉ bao gồm các dạng của từ gốc đó, không lấy từ khác.`;
+        const userPrompt = `Từ cần dịch: "${word}"`;
 
         const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY; 
         if (!apiKey) {
@@ -43,7 +45,7 @@ Các trạng thái của từ: (Liệt kê các biến thể chia thì, số ít
                 model: "llama-3.1-8b-instant",
                 messages: [
                     { role: "system", content: systemPrompt },
-                    { role: "user", content: `Từ cần dịch: "${word}"` }
+                    { role: "user", content: userPrompt }
                 ],
                 temperature: 0.7
             })
