@@ -14,9 +14,9 @@ export default async function handler(req, res) {
 Quy tắc định dạng TRẢ LỜI NGHIÊM NGẶT (Không dùng dấu nháy đơn/kép bao quanh nghĩa, mọi câu đều kết thúc bằng dấu chấm):
 Cách hiển thị:
 ${word}: Nghĩa 1, Nghĩa 2.
-- Câu ví dụ tiếng Anh 1: Nghĩa tiếng Việt.
-- Câu ví dụ tiếng Anh 2: Nghĩa tiếng Việt.
-VD: - He is running fast: Anh ấy đang chạy nhanh.
+- English Example: Nghĩa tiếng Việt.
+- English Example: Nghĩa tiếng Việt.
+(VD: - He is running fast: Anh ấy đang chạy nhanh.)
 Sắc thái: (Ghi ngắn gọn sắc thái tại đây).
 Lưu ý: 
 Câu ví dụ tiếng anh phải là 1 câu tiếng anh
