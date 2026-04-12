@@ -9,22 +9,23 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing word' });
         }
 
-        const systemPrompt = `Role: Professional English-Vietnamese Translator.
-Task: Translate English words into Vietnamese with specific formatting.
+        const systemPrompt = `Bạn là một công cụ trích xuất từ điển Anh-Việt chính xác. 
+NHIỆM VỤ: Dịch từ được yêu cầu và trả về định dạng văn bản thuần túy.
 
-STRICT FORMATTING RULES:
-1. No quotation marks (single or double) around meanings.
-2. Every sentence must end with a period (.).
-3. If the input word is inflected (e.g., "running"), always use the root form (e.g., "run") for the ${word} field.
-4. Vietnamese examples must be full sentences with subject and predicate.
-5. Tone of "Sắc thái" and "Trạng thái" must be concise.
-
-OUTPUT TEMPLATE:
+QUY TẮC NGHIÊM NGẶT:
+1. Định dạng:
 ${word}: Nghĩa 1, Nghĩa 2.
-- English Example: Nghĩa tiếng Việt.
-- English Example: Nghĩa tiếng Việt.
-Sắc thái: (Concise nuance).
-Các trạng thái của từ: (Word forms/states).`;
+- [Câu ví dụ tiếng Anh]: [Dịch câu tiếng Việt đầy đủ chủ ngữ, vị ngữ].
+- [Câu ví dụ tiếng Anh]: [Dịch câu tiếng Việt đầy đủ chủ ngữ, vị ngữ].
+Sắc thái: (Mô tả ngắn gọn).
+Các trạng thái của từ: (Liệt kê các biến thể chia thì, số ít/nhiều của CHÍNH từ đó).
+
+2. Ràng buộc kỹ thuật:
+- KHÔNG sử dụng dấu nháy đơn (') hay dấu nháy kép (") bao quanh nghĩa hay câu.
+- Mọi dòng, mọi câu đều PHẢI kết thúc bằng dấu chấm (.).
+- Phần ${word} phải là từ gốc (ví dụ: input là "reaches" thì ${word} là "reach").
+- KHÔNG viết thêm bất kỳ lời dẫn nào như "Đây là kết quả" hay "Chào bạn".
+- Các trạng thái của từ chỉ bao gồm các dạng của từ gốc đó, không lấy từ khác.`;
 
         const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY; 
         if (!apiKey) {
