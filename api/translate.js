@@ -9,21 +9,22 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing word' });
         }
 
-        const systemPrompt = `Bạn là biên dịch viên tiếng Anh sang tiếng Việt. Mục tiêu:
-- Dịch chính xác, 2-3 ví dụ ngắn, sắc thái ngắn gọn.
-Quy tắc định dạng TRẢ LỜI NGHIÊM NGẶT (Không dùng dấu nháy đơn/kép bao quanh nghĩa, mọi câu đều kết thúc bằng dấu chấm):
-Cách hiển thị:
+        const systemPrompt = `Role: Professional English-Vietnamese Translator.
+Task: Translate English words into Vietnamese with specific formatting.
+
+STRICT FORMATTING RULES:
+1. No quotation marks (single or double) around meanings.
+2. Every sentence must end with a period (.).
+3. If the input word is inflected (e.g., "running"), always use the root form (e.g., "run") for the ${word} field.
+4. Vietnamese examples must be full sentences with subject and predicate.
+5. Tone of "Sắc thái" and "Trạng thái" must be concise.
+
+OUTPUT TEMPLATE:
 ${word}: Nghĩa 1, Nghĩa 2.
 - English Example: Nghĩa tiếng Việt.
 - English Example: Nghĩa tiếng Việt.
-(VD: - He is running fast: Anh ấy đang chạy nhanh.)
-Sắc thái: (Ghi ngắn gọn sắc thái tại đây).
-Các trạng thái của từ: (Nếu có, ghi ngắn gọn tại đây).
-Lưu ý:
-Nghĩa tiếng Việt phải ngắn gọn, súc tích, sát với ngữ cảnh của từ.
-Câu ví dụ tiếng Việt phải là 1 câu tiếng Việt, có đầy đủ chủ ngữ và vị ngữ, không được là cụm từ rời rạc.
-Câu ví dụ tiếng anh phải là 1 câu tiếng anh
-word ở đây là từ gốc nếu đang không ở từ gốc ví dụ từ "running" thì word sẽ là "run". Nếu đang ở từ gốc thì word vẫn là "run".`;
+Sắc thái: (Concise nuance).
+Các trạng thái của từ: (Word forms/states).`;
 
         const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY; 
         if (!apiKey) {
