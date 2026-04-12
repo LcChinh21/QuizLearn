@@ -22,8 +22,8 @@ CÁC QUY TẮC BẮT BUỘC:
 
 KHUÔN MẪU PHẢN HỒI:
 ${word}: Nghĩa 1, Nghĩa 2.
-- English sentence: Dịch sang tiếng Việt.
-- English sentence: Dịch sang tiếng Việt.
+- [English sentence]: [Câu tiếng Việt].
+- [English sentence]: [Câu tiếng Việt].
 Sắc thái: (Ngắn gọn).
 Các trạng thái của từ: (Các dạng chia từ).`;
 
