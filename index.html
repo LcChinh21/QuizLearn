@@ -6,6 +6,8 @@
     <title>QuizzLearn - English Vocabulary Master</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Azure Speech SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/dist/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
 </head>
 <body>
     <header>
@@ -138,6 +140,18 @@
                         <i class="fas fa-magic"></i> Dịch nghĩa
                     </button>
                 </div>
+                
+                <!-- Azure Speech Controls -->
+                <div id="speech-controls" style="display: none; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
+                    <button id="tts-btn" class="primary-btn" style="background: #3498db; color: white; display:flex; align-items:center; gap:5px; border:none; padding: 8px 15px; border-radius:8px; cursor: pointer;">
+                        <i class="fas fa-volume-up"></i> Nghe mẫu
+                    </button>
+                    <button id="pronounce-btn" class="primary-btn" style="background: #e74c3c; color: white; display:flex; align-items:center; gap:5px; border:none; padding: 8px 15px; border-radius:8px; cursor: pointer;">
+                        <i class="fas fa-microphone"></i> Kiểm tra phát âm
+                    </button>
+                    <span id="pronounce-result" style="font-weight: bold; display:none; background: #fff; padding: 5px 12px; border-radius: 15px; border: 1px solid #dce4ec;"></span>
+                </div>
+
                 <div id="ai-result-box" class="hidden" style="background: #f0f4f8; padding: 15px; border-radius: 10px; border: 1px solid #dce4ec; white-space: pre-wrap; line-height: 1.6; font-size: 1rem; color: #2c3e50;"></div>
             </div>
 

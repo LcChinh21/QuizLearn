@@ -137,6 +137,11 @@ const addWordBtn = document.getElementById("add-word-btn");
 const geminiBtn = document.getElementById("gemini-btn");
 const aiLookupInput = document.getElementById("ai-lookup-input");
 const aiResultBox = document.getElementById("ai-result-box");
+const speechControls = document.getElementById("speech-controls");
+const ttsBtn = document.getElementById("tts-btn");
+const pronounceBtn = document.getElementById("pronounce-btn");
+const pronounceResult = document.getElementById("pronounce-result");
+let currentWordForSpeech = "";
 
 // Learn Elements
 const learnQuestion = document.getElementById("learn-question");
@@ -750,15 +755,129 @@ geminiBtn.addEventListener("click", async () => {
                 let rawMeaning = firstLine.split(':')[1].trim().replace(/^['"*\s]+|['"*\s.]+$/g, '').trim();
                 newMeaningInput.value = rawMeaning;
             }
+
+            // Kích hoạt các tính năng Audio (Nghe & Phát âm)
+            currentWordForSpeech = word;
+            speechControls.style.display = "flex";
+            pronounceResult.style.display = "none";
+            pronounceResult.innerHTML = "";
+
         } else {
             aiResultBox.innerHTML = "Không tìm thấy nghĩa của từ này.";
+            speechControls.style.display = "none";
         }
     } catch (error) {
         console.error("Gemini API Error:", error);
         aiResultBox.innerHTML = `<span style="color: red;">Lỗi khi dịch: ${error.message}</span>`;
+        speechControls.style.display = "none";
     } finally {
         geminiBtn.innerHTML = originalText;
         geminiBtn.disabled = false;
+    }
+});
+
+// ----- AZURE SPEECH SDK IMPLEMENTATION -----
+async function getAzureSpeechConfig() {
+    const res = await fetch('/api/azure-token');
+    if (!res.ok) throw new Error("Lỗi lấy Azure Token");
+    const data = await res.json();
+    return SpeechSDK.SpeechConfig.fromAuthorizationToken(data.token, data.region);
+}
+
+ttsBtn.addEventListener("click", async () => {
+    if (!currentWordForSpeech) return;
+    
+    ttsBtn.disabled = true;
+    ttsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+    try {
+        const speechConfig = await getAzureSpeechConfig();
+        // Giọng đọc mặc định (Jenny Neural chuẩn US)
+        speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
+
+        const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig);
+        
+        synthesizer.speakTextAsync(
+            currentWordForSpeech,
+            result => {
+                synthesizer.close();
+                ttsBtn.disabled = false;
+                ttsBtn.innerHTML = '<i class="fas fa-volume-up"></i> Nghe mẫu';
+            },
+            error => {
+                console.error(error);
+                synthesizer.close();
+                ttsBtn.disabled = false;
+                ttsBtn.innerHTML = '<i class="fas fa-volume-up"></i> Nghe mẫu';
+            }
+        );
+    } catch (err) {
+        console.error(err);
+        alert("Lỗi phát âm: " + err.message);
+        ttsBtn.disabled = false;
+        ttsBtn.innerHTML = '<i class="fas fa-volume-up"></i> Nghe mẫu';
+    }
+});
+
+pronounceBtn.addEventListener("click", async () => {
+    if (!currentWordForSpeech) return;
+
+    pronounceBtn.disabled = true;
+    pronounceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang nghe...';
+    pronounceResult.style.display = "none";
+    pronounceResult.innerHTML = "";
+
+    try {
+        const speechConfig = await getAzureSpeechConfig();
+        // Cần microphone
+        const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+
+        const pronunciationConfig = new SpeechSDK.PronunciationAssessmentConfig(
+            currentWordForSpeech,
+            SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark,
+            SpeechSDK.PronunciationAssessmentGranularity.Phoneme,
+            true
+        );
+
+        const recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+        pronunciationConfig.applyTo(recognizer);
+
+        recognizer.recognizeOnceAsync(
+            (result) => {
+                if (result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+                    const assessmentResult = SpeechSDK.PronunciationAssessmentResult.fromResult(result);
+                    const score = assessmentResult.pronunciationScore;
+                    
+                    pronounceResult.style.display = "inline-flex";
+                    if (score >= 80) {
+                        pronounceResult.innerHTML = `<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Tuyệt vời! Điểm: ${score}/100</span>`;
+                    } else if (score >= 60) {
+                        pronounceResult.innerHTML = `<span style="color: #f39c12;"><i class="fas fa-exclamation-triangle"></i> Khá tốt! Điểm: ${score}/100</span>`;
+                    } else {
+                        pronounceResult.innerHTML = `<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> Cần cố gắng hơn. Điểm: ${score}/100</span>`;
+                    }
+                } else {
+                    pronounceResult.style.display = "inline-flex";
+                    pronounceResult.innerHTML = `<span style="color: #e74c3c;">Không nhận dạng được giọng nói. Thử lại nhé.</span>`;
+                }
+                
+                recognizer.close();
+                pronounceBtn.disabled = false;
+                pronounceBtn.innerHTML = '<i class="fas fa-microphone"></i> Kiểm tra phát âm';
+            },
+            (err) => {
+                console.error(err);
+                alert("Lỗi ghi âm: Cần cấp quyền truy cập Microphone cho trình duyệt.");
+                recognizer.close();
+                pronounceBtn.disabled = false;
+                pronounceBtn.innerHTML = '<i class="fas fa-microphone"></i> Kiểm tra phát âm';
+            }
+        );
+    } catch (err) {
+        console.error(err);
+        alert("Lỗi kiểm tra phát âm: " + err.message);
+        pronounceBtn.disabled = false;
+        pronounceBtn.innerHTML = '<i class="fas fa-microphone"></i> Kiểm tra phát âm';
     }
 });
 
