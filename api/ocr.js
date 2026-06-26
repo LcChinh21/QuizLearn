@@ -77,6 +77,18 @@ RULES:
         const data = await response.json();
         let content = data.choices?.[0]?.message?.content || '[]';
 
+        // Try to extract JSON from thinking block content
+        let jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/);
+        if (jsonMatch) {
+            content = jsonMatch[1];
+        } else {
+            // Try to find JSON array directly
+            const arrayMatch = content.match(/\[[\s\S]*\]/);
+            if (arrayMatch) {
+                content = arrayMatch[0];
+            }
+        }
+
         content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
         let words;
