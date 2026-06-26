@@ -76,22 +76,23 @@ RULES:
         const data = await response.json();
         let content = data.choices?.[0]?.message?.content || '[]';
 
-        // Strip thinking blocks first
-        content = content.replace(/<think>[\s\S]*?<\/think>/gi, '');
+        // Strip thinking blocks - Groq uses <think> ...</think> tags
+        content = content.replace(/<think>[\s\S]*?</think>/gi, '');
 
         // Try to extract JSON from markdown code blocks
-        let jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/);
+        let jsonMatch = content.match(/```json\s*([\s\S]*?)```/i);
         if (jsonMatch) {
             content = jsonMatch[1];
         } else {
-            // Try to find JSON array directly (first [ to last ])
-            const arrayMatch = content.match(/\[[\s\S]*\]/);
-            if (arrayMatch) {
-                content = arrayMatch[0];
+            // Try to find JSON array - look for first [ after thinking is stripped
+            const firstBracket = content.indexOf('[');
+            const lastBracket = content.lastIndexOf(']');
+            if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+                content = content.substring(firstBracket, lastBracket + 1);
             }
         }
 
-        content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        content = content.replace(/```/g, '').trim();
 
         let words;
         try {
