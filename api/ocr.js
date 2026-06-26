@@ -42,7 +42,6 @@ RULES:
             },
             body: JSON.stringify({
                 model: 'qwen/qwen3.6-27b',
-                think: false,
                 messages: [
                     {
                         role: 'system',
@@ -77,12 +76,15 @@ RULES:
         const data = await response.json();
         let content = data.choices?.[0]?.message?.content || '[]';
 
-        // Try to extract JSON from thinking block content
+        // Strip thinking blocks first
+        content = content.replace(/<think>[\s\S]*?<\/think>/gi, '');
+
+        // Try to extract JSON from markdown code blocks
         let jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/);
         if (jsonMatch) {
             content = jsonMatch[1];
         } else {
-            // Try to find JSON array directly
+            // Try to find JSON array directly (first [ to last ])
             const arrayMatch = content.match(/\[[\s\S]*\]/);
             if (arrayMatch) {
                 content = arrayMatch[0];
