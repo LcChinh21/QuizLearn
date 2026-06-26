@@ -36,7 +36,8 @@
                         ]
                     }
                 ],
-                temperature: 0.1
+                temperature: 0.1,
+                reasoning_effort: 'off'
             })
         });
 
@@ -52,7 +53,7 @@
         // Strip thinking blocks using regex
         content = content.replace(/<think>[\s\S]*?<\/think>/gi, '');
         
-        // Find JSON array - extract everything from first [ to last ]
+        // Find JSON array - extract from first [ to last ]
         var firstBracket = content.indexOf('[');
         var lastBracket = content.lastIndexOf(']');
         if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
@@ -64,16 +65,24 @@
 
         // Log for debugging
         console.log('OCR cleaned content length:', content.length);
-        if (content.length > 0) {
-            console.log('OCR content preview:', content.substring(0, 200));
-        }
 
         var words;
         try {
+            // Try to parse JSON directly
             words = JSON.parse(content);
         } catch (parseError) {
-            console.error('JSON parse error:', parseError, 'Content:', content);
-            words = [];
+            console.error('JSON parse error:', parseError.message);
+            
+            // Fallback: try to fix common JSON issues
+            try {
+                // Try removing any trailing comma before closing bracket
+                var fixedContent = content.replace(/,(\s*[}\]])/g, '$1');
+                words = JSON.parse(fixedContent);
+                console.log('JSON fixed by removing trailing commas');
+            } catch (e2) {
+                console.error('JSON fix failed');
+                words = [];
+            }
         }
 
         if (!Array.isArray(words)) {
