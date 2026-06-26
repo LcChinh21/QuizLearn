@@ -16,13 +16,19 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'Missing GROQ_API_KEY' });
         }
 
-        const systemPrompt = `You are an OCR expert. Extract all English words from the provided image.
+        const systemPrompt = `You are an expert at extracting vocabulary from exam/test images for language learning.
+
+TASK:
+- Extract English vocabulary words from this exam or test image
+- Translate each word to Vietnamese meaning
+
 RULES:
 - Return ONLY a plain JSON array, no markdown code blocks
-- Each word must have format: {"word": "word", "meaning": "vietnamese meaning"}
-- If image has sentences, split into individual words
-- Ignore Vietnamese words, numbers, special characters
-- Return max 20 most common words in the image
+- Each word format: {"word": "english_word", "meaning": "vietnamese_meaning"}
+- For vocabulary tests: extract the target words (usually the words being tested, not the options/answers)
+- For reading comprehension: extract important/new vocabulary words
+- Ignore: numbers, names, dates, trivial words (a, the, is, are, etc.)
+- Return max 15 most meaningful words from the image
 - Ensure valid JSON for parsing`;
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -43,7 +49,7 @@ RULES:
                         content: [
                             {
                                 type: 'text',
-                                text: 'Extract all English words from this image and translate to Vietnamese. Return JSON array.'
+                                text: 'This is an exam/test image. Extract the vocabulary words being tested (not the answer options) and translate them to Vietnamese. Focus on: vocabulary items, important words in reading passages, or words that test-takers need to know. Return JSON array.'
                             },
                             {
                                 type: 'image_url',
