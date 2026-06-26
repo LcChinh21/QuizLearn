@@ -42,6 +42,9 @@ RULES:
             },
             body: JSON.stringify({
                 model: 'qwen/qwen3.6-27b',
+                thinking: {
+                    type: "disabled"
+                },
                 messages: [
                     {
                         role: 'system',
