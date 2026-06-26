@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+﻿export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
@@ -16,50 +16,23 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'Missing GROQ_API_KEY' });
         }
 
-        const systemPrompt = `You are an expert at extracting vocabulary from exam/test images.
-
-TASK:
-- Extract ALL English vocabulary words from this image
-- Extract word, phonetic (IPA pronunciation), part of speech, and Vietnamese meaning
-
-OUTPUT FORMAT:
-Return ONLY a plain JSON array with this exact format:
-[{"word": "english_word", "phonetic": "/ɪpsəˈluːt/", "type": "(n)", "meaning": "Vietnamese meaning"}]
-
-RULES:
-- Extract ALL vocabulary words shown in the image (no limit)
-- Include phonetic transcription if visible in the image
-- Include part of speech: (n) = noun, (v) = verb, (adj) = adjective, (adv) = adverb
-- Extract Vietnamese meaning accurately
-- Return ONLY JSON array, no markdown, no explanation
-- Ensure valid JSON`;
+        const systemPrompt = 'You are an expert at extracting vocabulary from exam images. Extract all English vocabulary words with phonetic, part of speech, and Vietnamese meaning. Return ONLY a JSON array: [{\"word\": \"word\", \"phonetic\": \"/fəˈnetɪk/\", \"type\": \"(n)\", \"meaning\": \"meaning\"}]';
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Authorization': 'Bearer ' + apiKey
             },
             body: JSON.stringify({
                 model: 'qwen/qwen3.6-27b',
                 messages: [
-                    {
-                        role: 'system',
-                        content: systemPrompt
-                    },
+                    { role: 'system', content: systemPrompt },
                     {
                         role: 'user',
                         content: [
-                            {
-                                type: 'text',
-                                text: 'IMPORTANT: Respond with ONLY valid JSON array. No explanations, no thinking, no markdown. Example: [{"word": "test", "phonetic": "/test/", "type": "(n)", "meaning": "test"}]'
-                            },
-                            {
-                                type: 'image_url',
-                                image_url: {
-                                    url: `data:image/jpeg;base64,${imageBase64}`
-                                }
-                            }
+                            { type: 'text', text: 'Respond with ONLY JSON array, no markdown.' },
+                            { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + imageBase64 } }
                         ]
                     }
                 ],
@@ -70,31 +43,37 @@ RULES:
         if (!response.ok) {
             const errBody = await response.text();
             console.error('Groq API Error:', response.status, errBody);
-            throw new Error(`Groq Vision API Error: ${response.status}`);
+            throw new Error('Groq Vision API Error: ' + response.status);
         }
 
         const data = await response.json();
-        let content = data.choices?.[0]?.message?.content || '[]';
+        let content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content ? data.choices[0].message.content : '[]';
 
         // Strip thinking blocks
-        content = content.replace(/<think>[\s\S]*?</think>/gi, '');
+        const ts = String.fromCharCode(60, 112, 32, 116, 104, 105, 110, 107, 62);
+        const te = String.fromCharCode(60, 47, 112, 116, 104, 105, 110, 107, 62);
+        var parts = content.split(ts);
+        content = parts[0];
+        for (var i = 1; i < parts.length; i++) {
+            var afterThink = parts[i].split(te);
+            content += afterThink.slice(1).join(te);
+        }
 
-        // Try to extract JSON from markdown code blocks
-        let jsonMatch = content.match(/```json\s*([\s\S]*?)```/i);
+        // Extract JSON from markdown or plain text
+        var jsonMatch = content.match(/`json\s*([\s\S]*?)`/i);
         if (jsonMatch) {
             content = jsonMatch[1];
         } else {
-            // Try to find JSON array - look for first [ after thinking is stripped
-            const firstBracket = content.indexOf('[');
-            const lastBracket = content.lastIndexOf(']');
+            var firstBracket = content.indexOf('[');
+            var lastBracket = content.lastIndexOf(']');
             if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
                 content = content.substring(firstBracket, lastBracket + 1);
             }
         }
 
-        content = content.replace(/```/g, '').trim();
+        content = content.replace(/\x60\x60\x60/g, '').trim();
 
-        let words;
+        var words;
         try {
             words = JSON.parse(content);
         } catch (parseError) {
