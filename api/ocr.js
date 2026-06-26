@@ -4,26 +4,26 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { imageBase64, language } = req.body;
-        
+        const { imageBase64 } = req.body;
+
         if (!imageBase64) {
             return res.status(400).json({ error: 'Missing image data' });
         }
 
-        const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
+        const apiKey = process.env.GROQ_API_KEY;
         if (!apiKey) {
+            console.error('Missing GROQ_API_KEY');
             return res.status(500).json({ error: 'Missing GROQ_API_KEY' });
         }
 
-        const lang = language || 'en';
-        const systemPrompt = `Bạn là một chuyên gia OCR. Nhiệm vụ: trích xuất tất cả các từ tiếng Anh từ hình ảnh được cung cấp.
-QUY TẮC:
-- Chỉ trả về MẢNG JSON thuần túy, không có markdown code block
-- Mỗi từ phải có cấu trúc: {"word": "từ", "meaning": "nghĩa tiếng Việt ngắn gọn"}
-- Nếu ảnh có câu/văn bản dài, chia thành các từ riêng lẻ
-- Bỏ qua các từ tiếng Việt, số, ký hiệu đặc biệt
-- Trả về tối đa 20 từ phổ biến nhất trong ảnh
-- Đảm bảo JSON hợp lệ để parse`;
+        const systemPrompt = `You are an OCR expert. Extract all English words from the provided image.
+RULES:
+- Return ONLY a plain JSON array, no markdown code blocks
+- Each word must have format: {"word": "word", "meaning": "vietnamese meaning"}
+- If image has sentences, split into individual words
+- Ignore Vietnamese words, numbers, special characters
+- Return max 20 most common words in the image
+- Ensure valid JSON for parsing`;
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
@@ -32,18 +32,18 @@ QUY TẮC:
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: 'llama-3.2-11b-vision-preview',
+                model: 'meta-llama/llama-4-scout-17b-16e-instruct',
                 messages: [
-                    { 
-                        role: 'system', 
-                        content: systemPrompt 
+                    {
+                        role: 'system',
+                        content: systemPrompt
                     },
                     {
                         role: 'user',
                         content: [
                             {
                                 type: 'text',
-                                text: 'Trích xuất tất cả từ tiếng Anh từ hình ảnh này và dịch sang tiếng Việt. Trả về JSON array.'
+                                text: 'Extract all English words from this image and translate to Vietnamese. Return JSON array.'
                             },
                             {
                                 type: 'image_url',
@@ -60,27 +60,31 @@ QUY TẮC:
 
         if (!response.ok) {
             const errBody = await response.text();
-            throw new Error(`Groq Vision API Error: ${response.status} ${errBody}`);
+            console.error('Groq API Error:', response.status, errBody);
+            throw new Error(`Groq Vision API Error: ${response.status}`);
         }
 
         const data = await response.json();
         let content = data.choices?.[0]?.message?.content || '[]';
-        
-        // Clean markdown if present
-        content = content.replace(/```json/g, '').replace(/```/g, '').trim();
-        
+
+        content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
         let words;
         try {
             words = JSON.parse(content);
-        } catch {
-            // If JSON parse fails, try to extract words manually
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError, 'Content:', content);
+            words = [];
+        }
+
+        if (!Array.isArray(words)) {
             words = [];
         }
 
         res.status(200).json({ words });
 
     } catch (error) {
-        console.error('OCR API Error:', error.message);
+        console.error('OCR API Error:', error);
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 }
