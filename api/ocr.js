@@ -76,7 +76,7 @@ RULES:
         const data = await response.json();
         let content = data.choices?.[0]?.message?.content || '[]';
 
-        // Strip thinking blocks - Groq uses <think> ...</think> tags
+        // Strip thinking blocks
         content = content.replace(/<think>[\s\S]*?</think>/gi, '');
 
         // Try to extract JSON from markdown code blocks
