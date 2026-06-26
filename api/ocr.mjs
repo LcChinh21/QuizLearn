@@ -50,8 +50,10 @@
         let content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content ? data.choices[0].message.content : '[]';
 
         // Strip thinking blocks - use String.fromCharCode to avoid parsing issues
-        const tsChars = [60,112,32,116,104,105,110,107,62];
-        const teChars = [60,47,112,116,104,105,110,107,62];
+        // <think> = 60,116,104,105,110,107,62
+        // </think> = 60,47,116,104,105,110,107,62
+        const tsChars = [60, 116, 104, 105, 110, 107, 62];
+        const teChars = [60, 47, 116, 104, 105, 110, 107, 62];
         var ts = String.fromCharCode(...tsChars);
         var te = String.fromCharCode(...teChars);
         
