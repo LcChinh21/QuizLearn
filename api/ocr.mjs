@@ -37,7 +37,7 @@
                     }
                 ],
                 temperature: 0.1,
-                reasoning_effort: 'off'
+                reasoning_effort: 'none'
             })
         });
 
