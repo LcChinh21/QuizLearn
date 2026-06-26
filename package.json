@@ -1,0 +1,30 @@
+{
+  "name": "quizlearn",
+  "version": "1.0.0",
+  "description": "English Vocabulary Master - Học từ vựng Tiếng Anh với Flashcard, AI Translation và Speech Recognition",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'No build step needed for static files'",
+    "preview": "node server.js",
+    "start": "NODE_ENV=production node server.js",
+    "lint": "echo 'No linter configured'",
+    "format": "echo 'No formatter configured'"
+  },
+  "keywords": [
+    "flashcard",
+    "vocabulary",
+    "english-learning",
+    "pwa",
+    "education"
+  ],
+  "author": "QuizzLearn",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

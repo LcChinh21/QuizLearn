@@ -1,13 +1,34 @@
-    <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">      
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="QuizzLearn - English Vocabulary Master. Học từ vựng Tiếng Anh hiệu quả với Flashcard, AI Translation và Speech Recognition.">
+    <meta name="keywords" content="học tiếng anh, từ vựng, flashcard, quiz, vocabulary, english learning">
+    <meta name="author" content="QuizzLearn">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="QuizzLearn - English Vocabulary Master">
+    <meta property="og:description" content="Học từ vựng Tiếng Anh hiệu quả với Flashcard, AI Translation và Speech Recognition">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="vi_VN">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#4255ff">
+    <meta name="msapplication-TileColor" content="#4255ff">
+    
     <title>QuizzLearn - English Vocabulary Master</title>
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Azure Speech SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+    <link rel="stylesheet" href="src/css/components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="public/manifest.json">
 </head>
 <body>
     <header>
@@ -27,15 +48,14 @@
         <div class="user-auth-nav" style="flex: 1; display: flex; justify-content: flex-end;">
             <div id="auth-user-dropdown" class="auth-dropdown">
                 <button id="auth-toggle-btn" class="nav-btn" style="display: flex; align-items: center; gap: 8px;">
-                    <img id="auth-avatar-display" src="https://ui-avatars.com/api/?name=Guest&background=random" style="width: 30px; height: 30px; border-radius: 50%; display: none;">
+                    <img id="auth-avatar-display" src="" style="width: 30px; height: 30px; border-radius: 50%; display: none;">
                     <i class="fas fa-user-circle" id="auth-icon-display"></i> 
                     <span id="auth-display-name">Login</span>
                 </button>
                 
-                <!-- Dropdown panel -->
+                <!-- Auth Panel -->
                 <div id="auth-panel" class="auth-panel">
-                    
-                    <!-- Form đăng nhập -->
+                    <!-- Login Form -->
                     <div id="login-form-view">
                         <h4 style="margin-bottom: 10px; color: var(--primary-color);"><i class="fas fa-sign-in-alt"></i> Login</h4>
                         <input type="text" id="login-username" placeholder="Username" class="auth-input">
@@ -44,7 +64,7 @@
                         <p class="auth-switch-text">New here? <a href="#" id="go-to-register">Register</a></p>
                     </div>
 
-                    <!-- Form đăng ký -->
+                    <!-- Register Form -->
                     <div id="register-form-view" class="hidden">
                         <h4 style="margin-bottom: 10px; color: var(--success-color);"><i class="fas fa-user-plus"></i> Register</h4>
                         <input type="text" id="reg-username" placeholder="Username" class="auth-input">
@@ -54,7 +74,7 @@
                         <p class="auth-switch-text">Already have account? <a href="#" id="go-to-login">Login</a></p>
                     </div>
 
-                    <!-- Form Profile (Hiện khi đã login) -->
+                    <!-- Profile Form -->
                     <div id="profile-view" class="hidden">
                         <h4 style="margin-bottom: 15px; color: #8e44ad;"><i class="fas fa-id-card"></i> Profile</h4>
                         <div style="text-align: center; margin-bottom: 15px;">
@@ -69,14 +89,13 @@
                         <button id="do-update-profile-btn" class="primary-btn auth-submit-btn" style="background-color: #8e44ad; margin-bottom: 8px;">Save Changes</button>
                         <button id="do-logout-btn" class="primary-btn auth-submit-btn" style="background-color: var(--error-color);">Logout</button>
                     </div>
-
                 </div>
             </div>
         </div>
     </header>
 
     <main>
-                <!-- DASHBOARD SECTION -->
+        <!-- DASHBOARD SECTION -->
         <section id="dashboard-section" class="app-section">
             <div class="section-header">
                 <h2>Your Study Sets</h2>
@@ -104,9 +123,7 @@
                     </button>
                 </div>
             </div>
-            <div class="set-grid" id="set-grid">
-                <!-- Sets go here -->
-            </div>
+            <div class="set-grid" id="set-grid"></div>
         </section>
 
         <!-- FLASHCARDS SECTION -->
@@ -127,27 +144,27 @@
                     <i class="fas fa-arrow-left"></i>
                 </button>
                 <span class="counter" id="card-counter">0 / 0</span>
-                <button class="control-btn" id="next-btn" title="Next word">    
+                <button class="control-btn" id="next-btn" title="Next word">   
                     <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
 
             <div class="word-management" style="margin-bottom: 20px;">
-                <h3><i class="fas fa-robot"></i> Trợ lý AI (Từ điển thông minh)</h3>        
+                <h3><i class="fas fa-robot"></i> AI Assistant (Smart Dictionary)</h3>        
                 <div class="add-word-form" style="margin-bottom: 10px;">
-                    <input type="text" id="ai-lookup-input" placeholder="Nhập từ tiếng Anh cần tra cứu..." required>
+                    <input type="text" id="ai-lookup-input" placeholder="Enter English word to lookup..." required>
                     <button id="gemini-btn" class="primary-btn" style="background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%); color: #333; border: none; font-weight: bold; white-space: nowrap;">
-                        <i class="fas fa-magic"></i> Dịch nghĩa
+                        <i class="fas fa-magic"></i> Translate
                     </button>
                 </div>
                 
                 <!-- Azure Speech Controls -->
                 <div id="speech-controls" style="display: none; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
                     <button id="tts-btn" class="primary-btn" style="background: #3498db; color: white; display:flex; align-items:center; gap:5px; border:none; padding: 8px 15px; border-radius:8px; cursor: pointer;">
-                        <i class="fas fa-volume-up"></i> Nghe mẫu
+                        <i class="fas fa-volume-up"></i> Listen
                     </button>
                     <button id="pronounce-btn" class="primary-btn" style="background: #e74c3c; color: white; display:flex; align-items:center; gap:5px; border:none; padding: 8px 15px; border-radius:8px; cursor: pointer;">
-                        <i class="fas fa-microphone"></i> Kiểm tra phát âm
+                        <i class="fas fa-microphone"></i> Check Pronunciation
                     </button>
                     <span id="pronounce-result" style="font-weight: bold; display:none; background: #fff; padding: 5px 12px; border-radius: 15px; border: 1px solid #dce4ec;"></span>
                 </div>
@@ -188,12 +205,8 @@
                 <div class="setting-group">
                     <label><b>Question Types:</b></label>
                     <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" id="setting-mc" checked> Multiple Choice
-                        </label>
-                        <label>
-                            <input type="checkbox" id="setting-written"> Written Answer
-                        </label>
+                        <label><input type="checkbox" id="setting-mc" checked> Multiple Choice</label>
+                        <label><input type="checkbox" id="setting-written"> Written Answer</label>
                     </div>
                 </div>
                 <div class="setting-group">
@@ -214,11 +227,7 @@
                 <div class="question-area">
                     <h3 id="learn-question">Question here</h3>
                 </div>
-
-                <!-- Multiple Choice -->
                 <div class="options-grid" id="learn-options"></div>
-
-                <!-- Written Answer -->
                 <div class="written-area hidden" id="learn-written">
                     <input type="text" id="learn-answer-input" placeholder="Type your answer...">
                     <button id="learn-submit-btn" class="primary-btn">Submit Answer</button>
@@ -227,7 +236,7 @@
             </div>
 
             <div id="learn-results" class="results-area hidden">
-                <h2>Learning Complete! 🎉</h2>
+                <h2>Learning Complete!</h2>
                 <p id="learn-result-details">Amazing job!</p>
                 <button id="learn-restart" class="primary-btn">Try Again</button>
             </div>
@@ -247,12 +256,8 @@
                 <div class="setting-group">
                     <label><b>Question Types:</b></label>
                     <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" id="test-setting-mc" checked> Multiple Choice
-                        </label>
-                        <label>
-                            <input type="checkbox" id="test-setting-written"> Written Answer
-                        </label>
+                        <label><input type="checkbox" id="test-setting-mc" checked> Multiple Choice</label>
+                        <label><input type="checkbox" id="test-setting-written"> Written Answer</label>
                     </div>
                 </div>
                 <div class="setting-group">
@@ -273,11 +278,7 @@
                 <div class="question-area">
                     <h3 id="test-question">Question here</h3>
                 </div>
-
-                <!-- Multiple Choice -->
                 <div class="options-grid" id="test-options"></div>
-
-                <!-- Written Answer -->
                 <div class="written-area hidden" id="test-written">
                     <input type="text" id="test-answer-input" placeholder="Type your answer...">
                     <button id="test-submit-btn" class="primary-btn">Submit Answer</button>
@@ -294,18 +295,25 @@
         </section>
     </main>
 
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- External Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- App Script -->
+    <script src="script.js"></script>
+    
+    <!-- Service Worker -->
     <script>
-        // Debug: catch ALL errors including those from script.js parsing
-        window._allErrors = [];
-        window.addEventListener('error', function(e) {
-            window._allErrors.push(e.message + ' at line ' + e.lineno);
-            document.title = 'JS_ERROR: ' + e.message;
-        });
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
     </script>
-    <script src="script.js?v=2"></script>
 </body>
 </html>
-
-
-
