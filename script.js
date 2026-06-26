@@ -785,14 +785,12 @@ if (flashcardSpeakBtn) {
     });
 }
 
-// Learn Speak & Pronounce
-let learnSpeakBtn, learnPronounceBtn, learnPronounceResult;
-let testSpeakBtn, testPronounceBtn, testPronounceResult;
+// Learn Speak
+let learnSpeakBtn;
+let testSpeakBtn;
 
 function setupLearnSpeechControls() {
     learnSpeakBtn = document.getElementById("learn-speak-btn");
-    learnPronounceBtn = document.getElementById("learn-pronounce-btn");
-    learnPronounceResult = document.getElementById("learn-pronounce-result");
     
     if (learnSpeakBtn) {
         learnSpeakBtn.onclick = async () => {
@@ -826,72 +824,10 @@ function setupLearnSpeechControls() {
             }
         };
     }
-    
-    if (learnPronounceBtn) {
-        learnPronounceBtn.onclick = async () => {
-            if (!currentLearnWord) return;
-            
-            learnPronounceBtn.disabled = true;
-            learnPronounceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            if (learnPronounceResult) learnPronounceResult.style.display = "none";
-            
-            try {
-                const speechConfig = await getAzureSpeechConfig();
-                const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
-                const pronunciationConfig = new SpeechSDK.PronunciationAssessmentConfig(
-                    currentLearnWord.word,
-                    SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark,
-                    SpeechSDK.PronunciationAssessmentGranularity.Phoneme,
-                    true
-                );
-                
-                const recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
-                pronunciationConfig.applyTo(recognizer);
-                
-                recognizer.recognizeOnceAsync(
-                    result => {
-                        if (result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
-                            const assessmentResult = SpeechSDK.PronunciationAssessmentResult.fromResult(result);
-                            const score = assessmentResult.pronunciationScore;
-                            
-                            if (learnPronounceResult) {
-                                learnPronounceResult.style.display = "block";
-                                if (score >= 80) {
-                                    learnPronounceResult.innerHTML = `<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Tuyệt vời! Điểm: ${score}/100</span>`;
-                                } else if (score >= 60) {
-                                    learnPronounceResult.innerHTML = `<span style="color: #f39c12;"><i class="fas fa-exclamation-triangle"></i> Khá tốt! Điểm: ${score}/100</span>`;
-                                } else {
-                                    learnPronounceResult.innerHTML = `<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> Cần cố gắng hơn. Điểm: ${score}/100</span>`;
-                                }
-                            }
-                        } else {
-                            if (learnPronounceResult) {
-                                learnPronounceResult.style.display = "block";
-                                learnPronounceResult.innerHTML = `<span style="color: #e74c3c;">Không nhận dạng được giọng nói.</span>`;
-                            }
-                        }
-                        recognizer.close();
-                        learnPronounceBtn.disabled = false;
-                        learnPronounceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                    },
-                    err => {
-                        recognizer.close();
-                        learnPronounceBtn.disabled = false;
-                        learnPronounceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                    }
-                );
-            } catch (err) {
-                learnPronounceBtn.disabled = false;
-                learnPronounceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-            }
-        };
-    }
 }
 
 function setupTestSpeechControls() {
     testSpeakBtn = document.getElementById("test-speak-btn");
-    testPronounceBtn = document.getElementById("test-pronounce-btn");
-    testPronounceResult = document.getElementById("test-pronounce-result");
     
     if (testSpeakBtn) {
         testSpeakBtn.onclick = async () => {
@@ -922,66 +858,6 @@ function setupTestSpeechControls() {
             } catch (err) {
                 testSpeakBtn.disabled = false;
                 testSpeakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-            }
-        };
-    }
-    
-    if (testPronounceBtn) {
-        testPronounceBtn.onclick = async () => {
-            if (!currentTestWord) return;
-            
-            testPronounceBtn.disabled = true;
-            testPronounceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            if (testPronounceResult) testPronounceResult.style.display = "none";
-            
-            try {
-                const speechConfig = await getAzureSpeechConfig();
-                const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
-                const pronunciationConfig = new SpeechSDK.PronunciationAssessmentConfig(
-                    currentTestWord.word,
-                    SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark,
-                    SpeechSDK.PronunciationAssessmentGranularity.Phoneme,
-                    true
-                );
-                
-                const recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
-                pronunciationConfig.applyTo(recognizer);
-                
-                recognizer.recognizeOnceAsync(
-                    result => {
-                        if (result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
-                            const assessmentResult = SpeechSDK.PronunciationAssessmentResult.fromResult(result);
-                            const score = assessmentResult.pronunciationScore;
-                            
-                            if (testPronounceResult) {
-                                testPronounceResult.style.display = "block";
-                                if (score >= 80) {
-                                    testPronounceResult.innerHTML = `<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Tuyệt vời! Điểm: ${score}/100</span>`;
-                                } else if (score >= 60) {
-                                    testPronounceResult.innerHTML = `<span style="color: #f39c12;"><i class="fas fa-exclamation-triangle"></i> Khá tốt! Điểm: ${score}/100</span>`;
-                                } else {
-                                    testPronounceResult.innerHTML = `<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> Cần cố gắng hơn. Điểm: ${score}/100</span>`;
-                                }
-                            }
-                        } else {
-                            if (testPronounceResult) {
-                                testPronounceResult.style.display = "block";
-                                testPronounceResult.innerHTML = `<span style="color: #e74c3c;">Không nhận dạng được giọng nói.</span>`;
-                            }
-                        }
-                        recognizer.close();
-                        testPronounceBtn.disabled = false;
-                        testPronounceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                    },
-                    err => {
-                        recognizer.close();
-                        testPronounceBtn.disabled = false;
-                        testPronounceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                    }
-                );
-            } catch (err) {
-                testPronounceBtn.disabled = false;
-                testPronounceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
             }
         };
     }
