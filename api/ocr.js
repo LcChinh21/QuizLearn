@@ -42,9 +42,6 @@ RULES:
             },
             body: JSON.stringify({
                 model: 'qwen/qwen3.6-27b',
-                thinking: {
-                    type: "disabled"
-                },
                 messages: [
                     {
                         role: 'system',
@@ -55,7 +52,7 @@ RULES:
                         content: [
                             {
                                 type: 'text',
-                                text: 'Extract ALL English vocabulary words from this image. Return as JSON array with: word, phonetic (IPA), part of speech (n/v/adj/adv), and Vietnamese meaning. Format: [{"word": "word", "phonetic": "/ɪpsəˈluːt/", "type": "(n)", "meaning": "nghia"}]'
+                                text: 'IMPORTANT: Respond with ONLY valid JSON array. No explanations, no thinking, no markdown. Example: [{"word": "test", "phonetic": "/test/", "type": "(n)", "meaning": "test"}]'
                             },
                             {
                                 type: 'image_url',
