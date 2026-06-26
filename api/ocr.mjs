@@ -49,26 +49,10 @@
         const data = await response.json();
         let content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content ? data.choices[0].message.content : '[]';
 
-        // Strip thinking blocks - use String.fromCharCode to avoid parsing issues
-        // <think> = 60,116,104,105,110,107,62
-        // </think> = 60,47,116,104,105,110,107,62
-        const tsChars = [60, 116, 104, 105, 110, 107, 62];
-        const teChars = [60, 47, 116, 104, 105, 110, 107, 62];
-        var ts = String.fromCharCode(...tsChars);
-        var te = String.fromCharCode(...teChars);
+        // Strip thinking blocks using regex
+        content = content.replace(/<think>[\s\S]*?<\/think>/gi, '');
         
-        // Remove all thinking blocks using string split/join
-        var parts = content.split(ts);
-        var cleaned = parts[0];
-        for (var i = 1; i < parts.length; i++) {
-            var subparts = parts[i].split(te);
-            if (subparts.length > 1) {
-                cleaned += subparts.slice(1).join(te);
-            }
-        }
-        content = cleaned;
-
-        // Find JSON array
+        // Find JSON array - extract everything from first [ to last ]
         var firstBracket = content.indexOf('[');
         var lastBracket = content.lastIndexOf(']');
         if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
@@ -76,7 +60,13 @@
         }
 
         // Remove markdown code blocks
-        content = content.replace(/`json\s*/gi, '').replace(/`\s*/g, '').trim();
+        content = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').replace(/`/g, '').trim();
+
+        // Log for debugging
+        console.log('OCR cleaned content length:', content.length);
+        if (content.length > 0) {
+            console.log('OCR content preview:', content.substring(0, 200));
+        }
 
         var words;
         try {
