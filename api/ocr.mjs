@@ -16,7 +16,7 @@
             return res.status(500).json({ error: 'Missing GROQ_API_KEY' });
         }
 
-        const systemPrompt = 'You are an expert at extracting vocabulary from exam images. Extract all English vocabulary words with phonetic, part of speech, and Vietnamese meaning. Return ONLY a JSON array: [{\"word\": \"word\", \"phonetic\": \"/fəˈnetɪk/\", \"type\": \"(n)\", \"meaning\": \"meaning\"}]';
+        const systemPrompt = 'You are an expert at extracting vocabulary from exam images. Extract all English vocabulary words with phonetic, part of speech, and Vietnamese meaning. Return ONLY a JSON array.';
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
@@ -31,12 +31,12 @@
                     {
                         role: 'user',
                         content: [
-                            { type: 'text', text: 'Respond with ONLY JSON array, no markdown.' },
+                            { type: 'text', text: 'Respond with ONLY valid JSON array, no markdown, no thinking.' },
                             { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + imageBase64 } }
                         ]
                     }
                 ],
-                temperature: 0.2
+                temperature: 0.1
             })
         });
 
@@ -49,29 +49,32 @@
         const data = await response.json();
         let content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content ? data.choices[0].message.content : '[]';
 
-        // Strip thinking blocks
-        const ts = String.fromCharCode(60, 112, 32, 116, 104, 105, 110, 107, 62);
-        const te = String.fromCharCode(60, 47, 112, 116, 104, 105, 110, 107, 62);
+        // Strip thinking blocks - use String.fromCharCode to avoid parsing issues
+        const tsChars = [60,112,32,116,104,105,110,107,62];
+        const teChars = [60,47,112,116,104,105,110,107,62];
+        var ts = String.fromCharCode(...tsChars);
+        var te = String.fromCharCode(...teChars);
+        
+        // Remove all thinking blocks using string split/join
         var parts = content.split(ts);
-        content = parts[0];
+        var cleaned = parts[0];
         for (var i = 1; i < parts.length; i++) {
-            var afterThink = parts[i].split(te);
-            content += afterThink.slice(1).join(te);
-        }
-
-        // Extract JSON from markdown or plain text
-        var jsonMatch = content.match(/`json\s*([\s\S]*?)`/i);
-        if (jsonMatch) {
-            content = jsonMatch[1];
-        } else {
-            var firstBracket = content.indexOf('[');
-            var lastBracket = content.lastIndexOf(']');
-            if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
-                content = content.substring(firstBracket, lastBracket + 1);
+            var subparts = parts[i].split(te);
+            if (subparts.length > 1) {
+                cleaned += subparts.slice(1).join(te);
             }
         }
+        content = cleaned;
 
-        content = content.replace(/\x60\x60\x60/g, '').trim();
+        // Find JSON array
+        var firstBracket = content.indexOf('[');
+        var lastBracket = content.lastIndexOf(']');
+        if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+            content = content.substring(firstBracket, lastBracket + 1);
+        }
+
+        // Remove markdown code blocks
+        content = content.replace(/`json\s*/gi, '').replace(/`\s*/g, '').trim();
 
         var words;
         try {
