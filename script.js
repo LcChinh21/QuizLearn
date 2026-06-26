@@ -1114,7 +1114,9 @@ function renderWordList() {
     vocabulary.forEach((item, index) => {
         const div = document.createElement("div");
         div.className = "list-item";
-        div.innerHTML = `<div class="list-word">${item.word}</div><div class="list-meaning">${item.meaning}</div><button class="delete-btn" onclick="deleteWord(${index})"><i class="fas fa-trash"></i></button>`;
+        const phonetic = item.phonetic ? `<span class="list-phonetic">${item.phonetic}</span>` : '';
+        const type = item.type ? `<span class="list-type">${item.type}</span>` : '';
+        div.innerHTML = `<div class="list-word">${item.word} ${phonetic} ${type}</div><div class="list-meaning">${item.meaning}</div><button class="delete-btn" onclick="deleteWord(${index})"><i class="fas fa-trash"></i></button>`;
         wordListContainer.appendChild(div);
     });
 }
