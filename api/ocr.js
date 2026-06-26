@@ -16,26 +16,23 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'Missing GROQ_API_KEY' });
         }
 
-        const systemPrompt = `You are an expert at extracting vocabulary from exam/test images for English learning.
+        const systemPrompt = `You are an expert at extracting vocabulary from exam/test images.
 
 TASK:
-- Analyze this exam/test image carefully
-- Extract English vocabulary words that students need to learn
-- Provide accurate Vietnamese translations
+- Extract ALL English vocabulary words from this image
+- Extract word, phonetic (IPA pronunciation), part of speech, and Vietnamese meaning
 
-EXTRACTION PRIORITY:
-1. For VOCABULARY exercises: extract the words being tested (the blanks, the words in the question)
-2. For READING COMPREHENSION: extract important/advanced vocabulary words from the passage
-3. For SENTENCE COMPLETION: extract the words that fill the blanks
-4. For MULTIPLE CHOICE: extract the vocabulary words from the questions
+OUTPUT FORMAT:
+Return ONLY a plain JSON array with this exact format:
+[{"word": "english_word", "phonetic": "/ɪpsəˈluːt/", "type": "(n)", "meaning": "Vietnamese meaning"}]
 
 RULES:
-- Return ONLY a plain JSON array, no markdown code blocks
-- Each word format: {"word": "english_word", "meaning": "vietnamese_meaning"}
-- Include 1 example sentence in Vietnamese if the word is commonly used in context
-- Ignore: answer choices (A, B, C, D), numbers, dates, common articles (a, the)
-- Return 10-20 most important vocabulary words
-- Ensure valid JSON for parsing`;
+- Extract ALL vocabulary words shown in the image (no limit)
+- Include phonetic transcription if visible in the image
+- Include part of speech: (n) = noun, (v) = verb, (adj) = adjective, (adv) = adverb
+- Extract Vietnamese meaning accurately
+- Return ONLY JSON array, no markdown, no explanation
+- Ensure valid JSON`;
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
@@ -44,7 +41,7 @@ RULES:
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+                model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
                 messages: [
                     {
                         role: 'system',
@@ -55,7 +52,7 @@ RULES:
                         content: [
                             {
                                 type: 'text',
-                                text: 'Extract ALL English vocabulary words from this exam that students need to learn. Focus on: words being tested in vocabulary exercises, important words in reading passages, words in sentence completion questions. DO NOT include answer options (A, B, C, D choices). Return as JSON array with word and meaning.'
+                                text: 'Extract ALL English vocabulary words from this image. Return as JSON array with: word, phonetic (IPA), part of speech (n/v/adj/adv), and Vietnamese meaning. Format: [{"word": "word", "phonetic": "/ɪpsəˈluːt/", "type": "(n)", "meaning": "nghia"}]'
                             },
                             {
                                 type: 'image_url',
