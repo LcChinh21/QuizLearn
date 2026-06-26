@@ -41,7 +41,7 @@ RULES:
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
+                model: 'llama-3.2-90b-vision-preview',
                 messages: [
                     {
                         role: 'system',
