@@ -16,19 +16,25 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'Missing GROQ_API_KEY' });
         }
 
-        const systemPrompt = `You are an expert at extracting vocabulary from exam/test images for language learning.
+        const systemPrompt = `You are an expert at extracting vocabulary from exam/test images for English learning.
 
 TASK:
-- Extract English vocabulary words from this exam or test image
-- Translate each word to Vietnamese meaning
+- Analyze this exam/test image carefully
+- Extract English vocabulary words that students need to learn
+- Provide accurate Vietnamese translations
+
+EXTRACTION PRIORITY:
+1. For VOCABULARY exercises: extract the words being tested (the blanks, the words in the question)
+2. For READING COMPREHENSION: extract important/advanced vocabulary words from the passage
+3. For SENTENCE COMPLETION: extract the words that fill the blanks
+4. For MULTIPLE CHOICE: extract the vocabulary words from the questions
 
 RULES:
 - Return ONLY a plain JSON array, no markdown code blocks
 - Each word format: {"word": "english_word", "meaning": "vietnamese_meaning"}
-- For vocabulary tests: extract the target words (usually the words being tested, not the options/answers)
-- For reading comprehension: extract important/new vocabulary words
-- Ignore: numbers, names, dates, trivial words (a, the, is, are, etc.)
-- Return max 15 most meaningful words from the image
+- Include 1 example sentence in Vietnamese if the word is commonly used in context
+- Ignore: answer choices (A, B, C, D), numbers, dates, common articles (a, the)
+- Return 10-20 most important vocabulary words
 - Ensure valid JSON for parsing`;
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -49,7 +55,7 @@ RULES:
                         content: [
                             {
                                 type: 'text',
-                                text: 'This is an exam/test image. Extract the vocabulary words being tested (not the answer options) and translate them to Vietnamese. Focus on: vocabulary items, important words in reading passages, or words that test-takers need to know. Return JSON array.'
+                                text: 'Extract ALL English vocabulary words from this exam that students need to learn. Focus on: words being tested in vocabulary exercises, important words in reading passages, words in sentence completion questions. DO NOT include answer options (A, B, C, D choices). Return as JSON array with word and meaning.'
                             },
                             {
                                 type: 'image_url',
@@ -60,7 +66,7 @@ RULES:
                         ]
                     }
                 ],
-                temperature: 0.3
+                temperature: 0.2
             })
         });
 
