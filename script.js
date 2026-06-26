@@ -101,14 +101,27 @@ async function saveData() {
     }
 }
 
-// H�m kh?i t?o ri�ng cho t?o Set (k�o th�m Upsert)
-async function saveSetToSupabase(newSet) {    await setupSupabase();    if (supabaseClient) {
-        await supabaseClient.from(SUPABASE_TABLE).upsert({
-            id: newSet.id,
-            name: newSet.name,
-            words: newSet.words,
-            author: newSet.author || null
-        });
+// Function to save new Set to Supabase
+async function saveSetToSupabase(newSet) {
+    try {
+        await setupSupabase();
+        if (supabaseClient) {
+            const { data, error } = await supabaseClient.from(SUPABASE_TABLE).upsert({
+                id: newSet.id,
+                name: newSet.name,
+                words: newSet.words,
+                author: newSet.author || null
+            });
+            if (error) {
+                console.error('Supabase saveSetToSupabase error:', error);
+            } else {
+                console.log('OCR set saved to Supabase:', newSet.name);
+            }
+        } else {
+            console.log('Supabase not connected - OCR set saved to localStorage only');
+        }
+    } catch (e) {
+        console.error('saveSetToSupabase exception:', e);
     }
 }
 // ----- DOM Elements -----
